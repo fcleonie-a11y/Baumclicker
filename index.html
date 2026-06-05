@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Baumclicker Beta 2.0</title>
+    <title>Baumclicker Beta 2.1</title>
 
     <style>
         body {
@@ -581,7 +581,7 @@
 
     <div id="meldung"></div>
     <div id="overlay"></div>
-    <div id="betaAnzeige">Beta 2.0</div>
+    <div id="betaAnzeige">Beta 2.1</div>
 
     <div id="shop" class="fenster">
         <h2>🏪 Shop</h2>
@@ -674,6 +674,14 @@
         <h2>📝 Änderungen & Behebungen</h2>
         <button id="aenderungenSchliessenButton">❌ Schließen</button>
         <div id="aenderungenBox">
+            <h3>Beta 2.1</h3>
+            <ul>
+                <li>☁️ Cloud-Fix: Beim Login auf einem anderen Browser wird der Cloud-Spielstand zuerst geladen.</li>
+                <li>🛡️ Leere lokale Spielstände können vorhandene Cloud-Spielstände nicht mehr automatisch überschreiben.</li>
+                <li>⚡ Automatisches Cloud-Speichern jede Sekunde wurde entfernt.</li>
+                <li>👆 Klickspeed bleibt bei maximal 20 Klicks pro Sekunde.</li>
+            </ul>
+
             <h3>Beta 2.0</h3>
             <ul>
                 <li>🔐 E-Mail/Passwort-Login eingebaut.</li>
@@ -725,7 +733,7 @@
             <input id="loginPasswortInput" type="password" placeholder="Passwort">
             <button id="loginButton">🔐 Anmelden</button>
             <button id="registerButton">📝 Registrieren</button>
-            <div class="hinweis">Für Beta 2.0 brauchst du ein Konto. Dein Spielstand wird in der Cloud gespeichert.</div>
+            <div class="hinweis">Für Beta 2.1 brauchst du ein Konto. Dein Spielstand wird sicher in der Cloud gespeichert.</div>
         </div>
     </div>
 
@@ -895,7 +903,7 @@
         const WETTER_CHECK_SEKUNDEN = 300;
         const WETTER_CHANCE = 0.30;
         const LUCKY_BLOCK_KOSTEN_KLICKS = 200;
-        const SPIEL_VERSION = "2.0";
+        const SPIEL_VERSION = "2.1";
         const OFFLINE_MAX_SEKUNDEN = 60 * 60 * 8;
         const ADMIN_IDS = [
             "I4tKxmYCr9NQC3WtUwJ5dU4SXn02"
@@ -970,6 +978,7 @@
         let letzterCloudUpload = 0;
         let nutzerEmail = "";
         let cloudGeladen = false;
+        let cloudStartGeprueft = false;
         let aktiveHaustiere = {};
         let aktiverSkin = "standard";
         let gekaufteSkins = { standard: true };
@@ -1222,6 +1231,7 @@
                 verwarnungen--;
                 meldungAnzeigen("🛡️ Eine Verwarnung wurde entfernt!");
                 speichern();
+                cloudSpeichern(true);
                 aktualisieren();
             } else if (verwarnungen === 0) {
                 meldungAnzeigen("🛡️ Du hast aktuell keine Verwarnung!");
@@ -1258,6 +1268,7 @@
                 meldungAnzeigen("⭐ Prestige! +1 Prestige-Punkt");
                 speichern();
                 onlineSpeichern(true);
+                cloudSpeichern(true);
                 aktualisieren();
             } else {
                 meldungAnzeigen("⭐ Prestige braucht " + benoetigt + " insgesamt verdientes Holz!");
@@ -1521,9 +1532,6 @@
 
             wetterOptikAktualisieren();
             effektAnzeigeAktualisieren();
-            speichern();
-            onlineSpeichern(false);
-            cloudSpeichern(false);
             aktualisieren();
         }, 1000);
 
@@ -1625,6 +1633,7 @@
 
                 speichern();
                 onlineSpeichern(false);
+                cloudSpeichern(true);
                 aktualisieren();
             } else {
                 fehlkauf();
@@ -1733,6 +1742,7 @@
             luckyBlockAusloesen(true);
             speichern();
             onlineSpeichern(false);
+            cloudSpeichern(true);
             aktualisieren();
         }
 
@@ -1972,6 +1982,7 @@
 
                 speichern();
                 onlineSpeichern(false);
+                cloudSpeichern(true);
                 aktualisieren();
             } else {
                 fehlkauf();
@@ -2025,6 +2036,7 @@
             }
 
             speichern();
+            cloudSpeichern(true);
             aktualisieren();
         }
 
@@ -2374,6 +2386,7 @@
             spielerNameHinweis.textContent = "Gespeichert als: " + spielerName;
             speichern();
             onlineSpeichern(true);
+            cloudSpeichern(true);
             startFenster.style.display = "none";
             overlay.classList.remove("pflichtOverlay");
             alleFensterSchliessen();
@@ -2666,8 +2679,20 @@
                 "<b>Cloud:</b> " + (cloudGeladen ? "geladen" : "noch nicht geladen");
         }
 
+        function istLeererStartSpielstand() {
+            return spielerName === "Spieler"
+                && klicks === 0
+                && holz === 0
+                && gesamtHolz === 0
+                && prestigePunkte === 0
+                && holzProKlick === 1
+                && holzProSekunde === 0;
+        }
+
         async function cloudSpeichern(sofort) {
             if (!firebaseBereit || !spielerId) return;
+            if (!cloudStartGeprueft) return;
+            if (spielerName === "Spieler" || istLeererStartSpielstand()) return;
 
             const jetzt = Date.now();
             if (!sofort && jetzt - letzterCloudUpload < 15000) return;
@@ -2696,12 +2721,15 @@
         async function cloudLadenBeimStart() {
             if (!firebaseBereit || !spielerId) return;
 
+            cloudStartGeprueft = false;
+            cloudGeladen = false;
+
             try {
                 const saveDoc = await getDoc(doc(db, "cloudSaves", spielerId));
 
                 if (!saveDoc.exists()) {
-                    cloudGeladen = false;
-                    await cloudSpeichern(true);
+                    cloudStartGeprueft = true;
+                    meldungAnzeigen("☁️ Kein Cloud-Spielstand gefunden. Neuer Spielstand wird erst nach einer Aktion gespeichert.");
                     return;
                 }
 
@@ -2709,30 +2737,21 @@
                 const cloudStand = daten.spielstand || null;
 
                 if (!cloudStand) {
-                    cloudGeladen = false;
-                    await cloudSpeichern(true);
-                    return;
-                }
-
-                const lokalerStand = JSON.parse(localStorage.getItem(SAVE_KEY) || "{}");
-                const lokalZeit = Number(lokalerStand.letzterSpeicherZeitpunkt || 0);
-                const cloudZeit = Number(cloudStand.letzterSpeicherZeitpunkt || 0);
-
-                if (lokalZeit > cloudZeit) {
-                    cloudGeladen = true;
-                    await cloudSpeichern(true);
-                    meldungAnzeigen("☁️ Lokaler neuerer Spielstand wurde in die Cloud übernommen.");
+                    cloudStartGeprueft = true;
+                    meldungAnzeigen("☁️ Cloud-Spielstand ist leer. Lokaler Spielstand bleibt aktiv.");
                     return;
                 }
 
                 localStorage.setItem(SAVE_KEY, JSON.stringify(cloudStand));
                 laden();
                 cloudGeladen = true;
+                cloudStartGeprueft = true;
                 aktualisieren();
                 meldungAnzeigen("☁️ Cloud-Spielstand geladen.");
             } catch (error) {
+                cloudStartGeprueft = false;
                 console.error("Cloud-Laden fehlgeschlagen:", error);
-                meldungAnzeigen("☁️ Cloud konnte nicht geladen werden. Lokaler Spielstand bleibt aktiv.");
+                meldungAnzeigen("☁️ Cloud konnte nicht geladen werden. Es wird nichts überschrieben.");
             }
         }
 
@@ -2990,7 +3009,6 @@
 
                         await cloudLadenBeimStart();
                         onlineSpeichern(true);
-                        cloudSpeichern(true);
                         versionPruefen();
                         pruefeNamensPflicht();
                     } else {
