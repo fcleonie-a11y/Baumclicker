@@ -1,0 +1,2856 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Baumclicker Beta 2.0</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding-top: 145px;
+            background-color: #6fcf5f;
+            background-image:
+                linear-gradient(45deg, rgba(255,255,255,0.08) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(255,255,255,0.08) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.08) 75%),
+                linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.08) 75%);
+            background-size: 30px 30px;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        h1 {
+            color: white;
+            text-shadow: 2px 2px 4px #000;
+            margin-top: 10px;
+        }
+
+        #kopfLeiste {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(30, 80, 25, 0.92);
+            backdrop-filter: blur(6px);
+            padding: 8px 10px 10px;
+            z-index: 5;
+            box-shadow: 0 3px 14px rgba(0,0,0,0.25);
+        }
+
+        #statusZeile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .statusChip {
+            color: white;
+            background: rgba(255,255,255,0.16);
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 15px;
+            text-shadow: 1px 1px 3px #000;
+            max-width: 92vw;
+        }
+
+        #menueZeile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        #menueZeile button {
+            font-size: 15px;
+            padding: 8px 11px;
+            margin: 0;
+        }
+
+        .menueGruppe {
+            position: relative;
+            display: inline-block;
+        }
+
+        #hauptMenueButton {
+            background: #ffffff;
+        }
+
+        #hauptMenueDropdown {
+            display: none;
+            position: absolute;
+            top: 42px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #f7fff3;
+            border-radius: 14px;
+            box-shadow: 0 8px 22px rgba(0,0,0,0.35);
+            padding: 8px;
+            min-width: 210px;
+            z-index: 50;
+        }
+
+        #hauptMenueDropdown.menueOffen {
+            display: block;
+        }
+
+        #hauptMenueDropdown button {
+            display: block;
+            width: 100%;
+            margin: 5px 0;
+            text-align: left;
+            background: white;
+        }
+
+        #hauptMenueDropdown button:hover {
+            background: #e9f8e4;
+        }
+
+        #betaAnzeige {
+            position: fixed;
+            right: 15px;
+            bottom: 15px;
+            color: white;
+            font-size: 18px;
+            text-shadow: 2px 2px 4px #000;
+            z-index: 5;
+        }
+
+        #wetterIcon {
+            font-size: 45px;
+            height: 50px;
+        }
+
+        #baum {
+            font-size: 100px;
+            margin: 10px;
+        }
+
+        .hauptAnzeige {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: white;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        #werteBox {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 25px;
+            max-width: 700px;
+            margin: 25px auto;
+        }
+
+        .wert {
+            font-size: 24px;
+            color: white;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        button {
+            font-size: 18px;
+            padding: 11px 18px;
+            cursor: pointer;
+            border-radius: 10px;
+            border: none;
+            margin: 5px;
+            touch-action: manipulation;
+        }
+
+        button:hover {
+            transform: scale(1.03);
+        }
+
+        button:disabled {
+            background-color: gray;
+            color: white;
+            cursor: not-allowed;
+        }
+
+        input,
+        textarea {
+            font-size: 18px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #aaa;
+            max-width: 90%;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            width: 95%;
+            min-height: 120px;
+            resize: vertical;
+            font-family: Arial, sans-serif;
+        }
+
+        #adminButton {
+            display: none;
+        }
+
+        #startFenster,
+        #loginFenster {
+            z-index: 25;
+        }
+
+        .pflichtOverlay {
+            z-index: 18 !important;
+        }
+
+        .fenster {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #f7fff3;
+            padding: 25px;
+            border-radius: 18px;
+            box-shadow: 0 0 25px rgba(0,0,0,0.4);
+            min-width: 450px;
+            max-width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            z-index: 20;
+        }
+
+        .fenster h2,
+        .fenster h3 {
+            color: #234d20;
+            text-shadow: none;
+        }
+
+        #shopHolzAnzeige {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 12px;
+            color: #234d20;
+        }
+
+        .shopBereich {
+            border: 2px solid #b7d8a8;
+            background: white;
+            border-radius: 15px;
+            margin-top: 15px;
+            padding: 12px;
+        }
+
+        .shopBereich button {
+            display: block;
+            width: 95%;
+            margin: 8px auto;
+        }
+
+        .luckyBereich {
+            border-color: #f0c43c;
+            background: #fff9dc;
+        }
+
+        .spezialHinweis {
+            font-weight: bold;
+            color: #8a5a00;
+        }
+
+        .adminGrid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .adminGrid input {
+            width: 100%;
+            max-width: none;
+        }
+
+        .achievementZeile {
+            border-bottom: 1px solid #ddd;
+            padding: 7px 0;
+        }
+
+        .achievementFertig {
+            font-weight: bold;
+            color: #217a25;
+        }
+
+        .achievementOffen {
+            color: #777;
+        }
+
+        .effektTabs {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .effektTabs button {
+            font-size: 16px;
+            padding: 8px 12px;
+        }
+
+        .effektTabAktiv {
+            background: #3cb043;
+            color: white;
+            font-weight: bold;
+        }
+
+        .effektBereich {
+            display: none;
+        }
+
+        .effektBereich.aktiv {
+            display: block;
+        }
+
+        .regenTropfen,
+        .blitzEffekt,
+        .regenbogenEffekt {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #aenderungenBox ul {
+            padding-left: 22px;
+            margin-top: 8px;
+        }
+
+        #aenderungenBox li {
+            margin-bottom: 8px;
+        }
+
+        .regenTropfen {
+            top: -30px;
+            color: rgba(60, 120, 255, 0.75);
+            font-size: 22px;
+            animation: regenFall 1.4s linear forwards;
+        }
+
+        @keyframes regenFall {
+            from { transform: translateY(-30px); opacity: 1; }
+            to { transform: translateY(110vh); opacity: 0; }
+        }
+
+        .blitzEffekt {
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.55);
+            animation: blitzFlash 0.25s ease-out forwards;
+        }
+
+        @keyframes blitzFlash {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .regenbogenEffekt {
+            top: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 70px;
+            animation: regenbogenSchweben 2s ease-in-out infinite alternate;
+            text-shadow: 0 0 18px white;
+        }
+
+        @keyframes regenbogenSchweben {
+            from { transform: translateX(-50%) translateY(0); }
+            to { transform: translateX(-50%) translateY(15px); }
+        }
+
+        .hinweis {
+            font-size: 14px;
+            color: #356b31;
+            margin-top: 8px;
+        }
+
+        .loginBox input,
+        .loginBox button {
+            display: block;
+            width: 92%;
+            margin: 10px auto;
+        }
+
+        .kartenBox {
+            background: white;
+            border: 2px solid #b7d8a8;
+            border-radius: 14px;
+            padding: 12px;
+            margin-top: 10px;
+            text-align: left;
+            line-height: 1.5;
+        }
+
+        .kartenBox button {
+            display: block;
+            width: 95%;
+            margin: 8px auto;
+        }
+
+        .aktivMarkierung {
+            color: #217a25;
+            font-weight: bold;
+        }
+
+
+        #statistikBereich {
+            margin-top: 20px;
+            border-top: 3px solid #234d20;
+            padding-top: 15px;
+        }
+
+        #statistikBox,
+        #wetterBox,
+        #ranglisteBox,
+        #bugListeBox,
+        #adminInfoBox {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 10px;
+            text-align: left;
+            font-size: 17px;
+            line-height: 1.5;
+        }
+
+        #statistikBox {
+            display: none;
+        }
+
+        .ranglistenZeile {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            border-bottom: 1px solid #e2e2e2;
+            padding: 7px 0;
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 8;
+        }
+
+        body.fensterOffen #kopfLeiste,
+        body.fensterOffen h1,
+        body.fensterOffen #wetterIcon,
+        body.fensterOffen #baum,
+        body.fensterOffen .hauptAnzeige,
+        body.fensterOffen #baumButton,
+        body.fensterOffen #prestigeButton,
+        body.fensterOffen #werteBox,
+        body.fensterOffen #betaAnzeige {
+            filter: blur(2px);
+            opacity: 0.28;
+            pointer-events: none;
+        }
+
+        #meldung {
+            display: none;
+            position: fixed;
+            top: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff4444;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 22px;
+            font-weight: bold;
+            z-index: 999;
+            box-shadow: 0 0 15px rgba(0,0,0,0.4);
+        }
+
+        #updateFenster {
+            z-index: 30;
+        }
+
+        #updateFenster p {
+            font-size: 18px;
+            line-height: 1.5;
+        }
+
+        #updateJetztButton {
+            background: #3cb043;
+            color: white;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding-top: 165px;
+            }
+
+            #statusZeile {
+                gap: 5px;
+            }
+
+            .statusChip {
+                font-size: 12px;
+                padding: 5px 7px;
+            }
+
+            #menueZeile button {
+                font-size: 13px;
+                padding: 7px 8px;
+            }
+
+            #werteBox {
+                grid-template-columns: 1fr;
+                margin: 20px 15px;
+            }
+
+            .wert {
+                font-size: 21px;
+            }
+
+            .fenster {
+                min-width: 0;
+                width: 88vw;
+                padding: 18px;
+            }
+
+            #baum {
+                font-size: 88px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="kopfLeiste">
+        <div id="statusZeile">
+            <div id="prestigeAnzeige" class="statusChip">⭐ Prestige: 0 | Bonus: 0%</div>
+            <div id="wetterAnzeige" class="statusChip">🌦️ Wetter in: 05:00</div>
+            <div id="onlineAnzeige" class="statusChip">☁️ Online: wird verbunden...</div>
+        </div>
+
+        <div id="menueZeile">
+            <button id="shopOeffnenButton">🏪 Shop</button>
+
+            <div class="menueGruppe">
+                <button id="hauptMenueButton">📋 Menü</button>
+                <div id="hauptMenueDropdown">
+                    <button id="ranglisteOeffnenButton">🏆 Rangliste</button>
+                    <button id="wetterButton">✨ Effekte</button>
+                    <button id="bugButton">🐞 Fehler melden</button>
+                    <button id="achievementButton">🏅 Erfolge</button>
+                    <button id="aenderungenButton">📝 Änderungen</button>
+                    <button id="einstellungenButton">⚙️ Einstellungen</button>
+                    <button id="haustierButton">🐾 Haustiere</button>
+                    <button id="skinButton">🎨 Skins</button>
+                    <button id="freundeButton">👥 Freunde</button>
+                    <button id="tradingButton">🔄 Trading Beta</button>
+                </div>
+            </div>
+
+            <button id="adminButton">👑 Admin</button>
+        </div>
+    </div>
+
+    <h1>🌳 Baumclicker</h1>
+
+    <div id="wetterIcon">🌤️</div>
+    <div id="baum">🌱</div>
+
+    <div class="hauptAnzeige" id="klickAnzeige">Klicks: 0</div>
+    <div class="hauptAnzeige" id="holzAnzeige">🪵 Holz: 0</div>
+
+    <button id="baumButton">🌳 Baum anklicken</button>
+    <button id="prestigeButton">⭐ Prestige durchführen</button>
+
+    <div id="werteBox">
+        <div class="wert" id="gesamtHolzAnzeige">📦 Gesamt verdient: 0</div>
+        <div class="wert" id="holzProKlickAnzeige">👆 Holz pro Klick: 1</div>
+        <div class="wert" id="holzProSekundeAnzeige">⏱️ Holz pro Sekunde: 0</div>
+        <div class="wert" id="verwarnungAnzeige">⚠️ Verwarnungen: 0/3</div>
+    </div>
+
+    <div id="meldung"></div>
+    <div id="overlay"></div>
+    <div id="betaAnzeige">Beta 2.0</div>
+
+    <div id="shop" class="fenster">
+        <h2>🏪 Shop</h2>
+        <div id="shopHolzAnzeige">🪵 Holz: 0</div>
+        <button id="shopSchliessenButton">❌ Schließen</button>
+
+        <div class="shopBereich">
+            <h3>☁️ Online-Profil</h3>
+            <input id="spielerNameInput" maxlength="18" placeholder="Dein Name">
+            <button id="spielerNameSpeichernButton">Name speichern</button>
+            <div class="hinweis" id="spielerNameHinweis">Name wird für die Online-Rangliste genutzt.</div>
+        </div>
+
+        <div class="shopBereich">
+            <h3>🏭 Produktion</h3>
+            <button id="holzfaellerButton"></button>
+            <button id="foersterButton"></button>
+            <button id="holzlagerButton"></button>
+            <button id="saegewerkButton"></button>
+        </div>
+
+        <div class="shopBereich">
+            <h3>🐾 Tiere</h3>
+            <button id="eichhoernchenButton"></button>
+            <button id="biberButton"></button>
+            <button id="baerButton"></button>
+        </div>
+
+        <div class="shopBereich">
+            <h3>👆 Klick-Upgrades</h3>
+            <button id="axtButton"></button>
+            <button id="eisenAxtButton"></button>
+            <button id="motorsaegeButton"></button>
+            <button id="goldAxtButton"></button>
+            <button id="diamantAxtButton"></button>
+        </div>
+
+        <div class="shopBereich">
+            <h3>🛡️ Sicherheit</h3>
+            <button id="versicherungButton">🛡️ Versicherung kaufen (2000 Holz) -1 Verwarnung</button>
+        </div>
+
+        <div class="shopBereich luckyBereich">
+            <h3>🎁 Lucky Block</h3>
+            <button id="luckyBlockButton">🎁 Lucky Block kaufen (200 Klicks)</button>
+            <div class="hinweis">
+                Zufällige Effekte: Holzbonus, Booster, Shop-Item, Spezialwetter, Weltenbaum-Samen oder selten eine Verwarnung.
+            </div>
+            <div class="hinweis spezialHinweis" id="weltenbaumAnzeige">💎 Weltenbaum-Samen: nicht gefunden</div>
+        </div>
+
+        <div id="statistikBereich">
+            <button id="statistikButton">📊 Statistiken anzeigen</button>
+            <div id="statistikBox"></div>
+        </div>
+    </div>
+
+    <div id="wetterFenster" class="fenster">
+        <h2>✨ Effekte</h2>
+        <button id="wetterSchliessenButton">❌ Schließen</button>
+
+        <div class="effektTabs">
+            <button id="effektWetterTabButton" class="effektTabAktiv">🌦️ Wetter</button>
+            <button id="effektLuckyTabButton">🎁 Lucky Block</button>
+        </div>
+
+        <div id="effektWetterBereich" class="effektBereich aktiv">
+            <div id="wetterBox"></div>
+        </div>
+
+        <div id="effektLuckyBereich" class="effektBereich">
+            <div id="luckyEffektBox"></div>
+        </div>
+    </div>
+
+    <div id="ranglisteFenster" class="fenster">
+        <h2>🏆 Online-Rangliste</h2>
+        <button id="ranglisteSchliessenButton">❌ Schließen</button>
+        <div class="hinweis">Sortierung: zuerst Prestige, danach Gesamt-Holz.</div>
+        <div id="ranglisteBox">Lade Rangliste...</div>
+    </div>
+
+    <div id="achievementFenster" class="fenster">
+        <h2>🏆 Erfolge</h2>
+        <button id="achievementSchliessenButton">❌ Schließen</button>
+        <div id="achievementBox"></div>
+    </div>
+
+    <div id="aenderungenFenster" class="fenster">
+        <h2>📝 Änderungen & Behebungen</h2>
+        <button id="aenderungenSchliessenButton">❌ Schließen</button>
+        <div id="aenderungenBox">
+            <h3>Beta 2.0</h3>
+            <ul>
+                <li>📋 Neue Menü-Struktur eingebaut.</li>
+                <li>🏆 Rangliste, Effekte, Fehler melden, Erfolge und Änderungen liegen jetzt im Menü.</li>
+                <li>🔄 Der alte Aktualisieren-Button wurde entfernt.</li>
+                <li>👑 Admin bleibt weiterhin nur für Admin-Accounts sichtbar.</li>
+            </ul>
+
+            <h3>Beta 1.6.2</h3>
+            <ul>
+                <li>🔄 Neuer Button: Seite sofort aktualisieren.</li>
+                <li>📝 Neuer Button: Änderungen & Behebungen direkt im Spiel ansehen.</li>
+                <li>✨ Effekt-Menü bleibt erhalten: Wetter- und Lucky-Block-Erklärungen.</li>
+                <li>🌧️ Regen bekommt sichtbare Tropfen.</li>
+                <li>⛈️ Sturm/Gewitter bekommt Blitz-Effekt.</li>
+                <li>🌈 Goldener Regenbogen bekommt sichtbaren Hintergrundeffekt.</li>
+                <li>⚠️ Lucky-Block-Pech und Sturm zeigen jetzt passende Verwarnungs-Meldungen.</li>
+                <li>📊 Statistik enthält Lucky-Block- und Wetter-Statistiken.</li>
+            </ul>
+
+            <h3>Beta 1.6</h3>
+            <ul>
+                <li>👑 Admin-Werte setzen eingebaut.</li>
+                <li>🌙 Offline-Fortschritt eingebaut.</li>
+                <li>🏆 Erfolge/Achievements eingebaut.</li>
+                <li>🎁 Lucky-Block-Statistik eingebaut.</li>
+            </ul>
+        </div>
+    </div>
+
+
+
+
+    <div id="loginFenster" class="fenster">
+        <h2>☁️ Baumclicker Login</h2>
+        <div class="loginBox">
+            <input id="loginEmailInput" type="email" placeholder="E-Mail-Adresse">
+            <input id="loginPasswortInput" type="password" placeholder="Passwort">
+            <button id="loginButton">🔐 Anmelden</button>
+            <button id="registerButton">📝 Registrieren</button>
+            <div class="hinweis">Für Beta 2.0 brauchst du ein Konto. Dein Spielstand wird dann in der Cloud gespeichert.</div>
+        </div>
+    </div>
+
+    <div id="einstellungenFenster" class="fenster">
+        <h2>⚙️ Einstellungen</h2>
+        <button id="einstellungenSchliessenButton">❌ Schließen</button>
+        <div id="accountInfoBox" class="kartenBox">Nicht angemeldet.</div>
+        <div class="shopBereich">
+            <h3>☁️ Cloud-Speicher</h3>
+            <button id="cloudSpeichernButton">☁️ Jetzt in Cloud speichern</button>
+            <button id="cloudLadenButton">📥 Aus Cloud laden</button>
+            <button id="accountWechselButton">🚪 Abmelden / Account wechseln</button>
+            <div class="hinweis">Beim Account-Wechsel wird vorher automatisch gespeichert.</div>
+        </div>
+    </div>
+
+    <div id="haustierFenster" class="fenster">
+        <h2>🐾 Haustiere</h2>
+        <button id="haustierSchliessenButton">❌ Schließen</button>
+        <div id="haustierBox"></div>
+    </div>
+
+    <div id="skinFenster" class="fenster">
+        <h2>🎨 Skins</h2>
+        <button id="skinSchliessenButton">❌ Schließen</button>
+        <div id="skinBox"></div>
+    </div>
+
+    <div id="freundeFenster" class="fenster">
+        <h2>👥 Freunde</h2>
+        <button id="freundeSchliessenButton">❌ Schließen</button>
+        <div class="kartenBox">
+            <input id="freundUidInput" placeholder="Firebase-UID vom Freund">
+            <button id="freundAnfrageButton">👥 Freundschaftsanfrage senden</button>
+            <div class="hinweis">Beta-Version: Freunde werden über UID hinzugefügt.</div>
+        </div>
+        <div id="freundeBox" class="kartenBox">Noch nicht geladen.</div>
+        <button id="freundeLadenButton">🔄 Freunde/Anfragen laden</button>
+    </div>
+
+    <div id="tradingFenster" class="fenster">
+        <h2>🔄 Trading Beta</h2>
+        <button id="tradingSchliessenButton">❌ Schließen</button>
+        <div class="kartenBox">
+            <input id="tradeUidInput" placeholder="Empfänger-UID">
+            <input id="tradeHolzInput" type="number" min="1" placeholder="Holz senden">
+            <button id="tradeSendenButton">🎁 Geschenk senden</button>
+            <div class="hinweis">Beta-Trading: Erstmal einfache Geschenke, kein Live-Handel.</div>
+        </div>
+        <div id="tradeBox" class="kartenBox">Noch nicht geladen.</div>
+        <button id="tradesLadenButton">🔄 Trades laden</button>
+    </div>
+
+    <div id="startFenster" class="fenster">
+        <h2>🌳 Willkommen bei Baumclicker</h2>
+        <p>Bitte wähle zuerst deinen Spielernamen. Der Name wird für die Online-Rangliste genutzt.</p>
+        <input id="startNameInput" maxlength="18" placeholder="Dein Name">
+        <br><br>
+        <button id="startNameSpeichernButton">✅ Spiel starten</button>
+        <div class="hinweis">Mindestens 2 Zeichen. Ohne Namen kann das Spiel nicht gestartet werden.</div>
+    </div>
+
+    <div id="bugFenster" class="fenster">
+        <h2>🐞 Fehler melden</h2>
+        <button id="bugSchliessenButton">❌ Schließen</button>
+        <p>Beschreibe kurz, was passiert ist und welchen Button du gedrückt hast.</p>
+        <textarea id="bugTextInput" maxlength="500" placeholder="Beispiel: Wenn ich auf Wetter klicke, bleibt das Fenster leer."></textarea>
+        <br>
+        <button id="bugSendenButton">📨 Fehler absenden</button>
+        <div class="hinweis">Bitte nur echte Fehler melden. Missbrauch kann zu Verwarnung oder Spielstand-Reset führen.</div>
+    </div>
+
+    <div id="adminFenster" class="fenster">
+        <h2>👑 Admin-Menü</h2>
+        <button id="adminSchliessenButton">❌ Schließen</button>
+        <div id="adminInfoBox"></div>
+        <div class="shopBereich">
+            <h3>🧪 Test-Funktionen</h3>
+            <button id="adminHolzButton">+10.000 Holz</button>
+            <button id="adminVerwarnungEntfernenButton">Alle Verwarnungen entfernen</button>
+            <button id="adminWetterButton">Wetter sofort testen</button>
+            <button id="adminLuckyButton">Lucky Block testen</button>
+            <button id="adminRegenbogenButton">Goldenen Regenbogen starten</button>
+            <button id="adminSamenButton">Weltenbaum-Samen geben/entfernen</button>
+            <button id="adminResetButton">Eigenen Spielstand zurücksetzen</button>
+        </div>
+
+        <div class="shopBereich">
+            <h3>⚙️ Werte setzen</h3>
+            <div class="adminGrid">
+                <span>Holz</span><input id="adminHolzInput" type="number" min="0" placeholder="z.B. 10000">
+                <button id="adminHolzSetzenButton">Holz setzen</button><button id="adminHolzPlusButton">+ Holz</button>
+
+                <span>Klicks</span><input id="adminKlicksInput" type="number" min="0" placeholder="z.B. 200">
+                <button id="adminKlicksSetzenButton">Klicks setzen</button><button id="adminKlicksPlusButton">+ Klicks</button>
+
+                <span>Gesamt-Holz</span><input id="adminGesamtHolzInput" type="number" min="0" placeholder="z.B. 50000">
+                <button id="adminGesamtHolzSetzenButton">Gesamt setzen</button><span></span>
+
+                <span>Holz/Klick</span><input id="adminHPKInput" type="number" min="1" placeholder="z.B. 25">
+                <button id="adminHPKSetzenButton">HPK setzen</button><span></span>
+
+                <span>Holz/Sekunde</span><input id="adminHPSInput" type="number" min="0" placeholder="z.B. 100">
+                <button id="adminHPSSetzenButton">HPS setzen</button><span></span>
+
+                <span>Prestige</span><input id="adminPrestigeInput" type="number" min="0" placeholder="z.B. 5">
+                <button id="adminPrestigeSetzenButton">Prestige setzen</button><span></span>
+
+                <span>Verwarnungen</span><input id="adminVerwarnungInput" type="number" min="0" max="2" placeholder="0-2">
+                <button id="adminVerwarnungSetzenButton">Verwarnungen setzen</button><span></span>
+            </div>
+        </div>
+        <div class="shopBereich">
+            <h3>🐞 Bug-Meldungen</h3>
+            <button id="bugListeLadenButton">Bug-Meldungen laden</button>
+            <div id="bugListeBox">Noch nicht geladen.</div>
+        </div>
+    </div>
+
+    <div id="updateFenster" class="fenster">
+        <h2>🔄 Neue Version verfügbar</h2>
+        <p id="updateText">Bitte lade die Seite neu, damit du die neueste Version spielst.</p>
+        <button id="updateJetztButton">🔄 Jetzt aktualisieren</button>
+        <div class="hinweis">Dein Spielstand bleibt erhalten.</div>
+    </div>
+
+    <script type="module">
+        window.addEventListener("error", function (event) {
+            const box = document.getElementById("meldung");
+            if (box) {
+                box.textContent = "⚠️ Spielfehler: " + event.message;
+                box.style.display = "block";
+            }
+            console.error(event.error || event.message);
+        });
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+        import {
+            getFirestore,
+            doc,
+            setDoc,
+            getDoc,
+            addDoc,
+            getDocs,
+            collection,
+            query,
+            orderBy,
+            limit,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBpgi8L-h9zO4-ap7UBTWFNho5T4F7sQa0",
+            authDomain: "baumclicker.firebaseapp.com",
+            projectId: "baumclicker",
+            storageBucket: "baumclicker.firebasestorage.app",
+            messagingSenderId: "514951401508",
+            appId: "1:514951401508:web:56dec32e5ea86379bac8b1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const SAVE_KEY = "baumSpielBeta1";
+        const MIN_KLICK_ABSTAND_MS = 50;
+        const WETTER_CHECK_SEKUNDEN = 300;
+        const WETTER_CHANCE = 0.30;
+        const LUCKY_BLOCK_KOSTEN_KLICKS = 200;
+        const SPIEL_VERSION = "2.0";
+        const OFFLINE_MAX_SEKUNDEN = 60 * 60 * 8;
+        const ADMIN_IDS = [
+            "knI7Tx88gxgPu95vi2eqhMMANyF2",
+            "1L6nIvqao2fu313PTerqEZEfNbJ3"
+        ];
+
+        let klicks = 0;
+        let holz = 0;
+        let gesamtHolz = 0;
+        let holzProKlick = 1;
+        let holzProSekunde = 0;
+        let verwarnungen = 0;
+        let prestigePunkte = 0;
+
+        let axtGekauft = false;
+        let eisenAxtGekauft = false;
+        let goldAxtGekauft = false;
+        let diamantAxtGekauft = false;
+        let motorsaegeGekauft = false;
+
+        let holzfaellerKosten = 50;
+        let foersterKosten = 250;
+        let holzlagerKosten = 500;
+        let saegewerkKosten = 1000;
+
+        let eichhoernchenKosten = 750;
+        let biberKosten = 2500;
+        let baerKosten = 8000;
+
+        let wetterTimer = WETTER_CHECK_SEKUNDEN;
+        let aktivesWetter = "Kein Wetter";
+        let wetterBonusKlick = 1;
+        let wetterBonusSekunde = 1;
+        let luckyBoosterAktiv = false;
+        let luckyBonusKlick = 1;
+        let luckyBonusSekunde = 1;
+        let weltenbaumSamen = false;
+        let luckyBlocksGekauft = 0;
+        let luckySpezialwetterAnzahl = 0;
+        let letzterSpeicherZeitpunkt = Date.now();
+
+        let luckyHolzBonusAnzahl = 0;
+        let luckyBoosterAnzahl = 0;
+        let luckyGratisItemAnzahl = 0;
+        let luckyWeltenbaumAnzahl = 0;
+        let luckyPrestigeAnzahl = 0;
+        let luckyPechAnzahl = 0;
+
+        let achievements = {};
+
+        let gesamtKlicksAllzeit = 0;
+        let gekaufteUpgrades = 0;
+        let fehlkaeufeGesamt = 0;
+        let wetterEreignisse = 0;
+        let prestigeDurchgefuehrt = 0;
+
+        let sonneAnzahl = 0;
+        let regenAnzahl = 0;
+        let sturmAnzahl = 0;
+        let windAnzahl = 0;
+        let keinWetterAnzahl = 0;
+
+        let letzterKlickZeitpunkt = 0;
+        let verdachtKlicks = 0;
+        let antiCheatWarnungen = 0;
+
+        let spielerId = null;
+        let spielerName = "Spieler";
+        let firebaseBereit = false;
+        let letzterOnlineUpload = 0;
+        let istAdmin = false;
+        let letzterBugReport = 0;
+        let letzterCloudUpload = 0;
+        let nutzerEmail = "";
+        let cloudGeladen = false;
+        let aktiveHaustiere = {};
+        let aktiverSkin = "standard";
+        let gekaufteSkins = { standard: true };
+
+        const klickAnzeige = document.getElementById("klickAnzeige");
+        const holzAnzeige = document.getElementById("holzAnzeige");
+        const shopHolzAnzeige = document.getElementById("shopHolzAnzeige");
+        const gesamtHolzAnzeige = document.getElementById("gesamtHolzAnzeige");
+        const holzProKlickAnzeige = document.getElementById("holzProKlickAnzeige");
+        const holzProSekundeAnzeige = document.getElementById("holzProSekundeAnzeige");
+        const prestigeAnzeige = document.getElementById("prestigeAnzeige");
+        const wetterAnzeige = document.getElementById("wetterAnzeige");
+        const verwarnungAnzeige = document.getElementById("verwarnungAnzeige");
+        const onlineAnzeige = document.getElementById("onlineAnzeige");
+        const baumAnzeige = document.getElementById("baum");
+        const wetterIcon = document.getElementById("wetterIcon");
+        const meldung = document.getElementById("meldung");
+
+        const baumButton = document.getElementById("baumButton");
+        const shopOeffnenButton = document.getElementById("shopOeffnenButton");
+        const hauptMenueButton = document.getElementById("hauptMenueButton");
+        const hauptMenueDropdown = document.getElementById("hauptMenueDropdown");
+        const shopSchliessenButton = document.getElementById("shopSchliessenButton");
+        const shop = document.getElementById("shop");
+        const overlay = document.getElementById("overlay");
+
+        const wetterButton = document.getElementById("wetterButton");
+        const wetterFenster = document.getElementById("wetterFenster");
+        const wetterSchliessenButton = document.getElementById("wetterSchliessenButton");
+        const wetterBox = document.getElementById("wetterBox");
+        const luckyEffektBox = document.getElementById("luckyEffektBox");
+        const effektWetterTabButton = document.getElementById("effektWetterTabButton");
+        const effektLuckyTabButton = document.getElementById("effektLuckyTabButton");
+        const effektWetterBereich = document.getElementById("effektWetterBereich");
+        const effektLuckyBereich = document.getElementById("effektLuckyBereich");
+
+        const ranglisteOeffnenButton = document.getElementById("ranglisteOeffnenButton");
+        const ranglisteFenster = document.getElementById("ranglisteFenster");
+        const ranglisteSchliessenButton = document.getElementById("ranglisteSchliessenButton");
+        const ranglisteBox = document.getElementById("ranglisteBox");
+        const achievementButton = document.getElementById("achievementButton");
+        const achievementFenster = document.getElementById("achievementFenster");
+        const achievementSchliessenButton = document.getElementById("achievementSchliessenButton");
+        const achievementBox = document.getElementById("achievementBox");
+        const aenderungenButton = document.getElementById("aenderungenButton");
+        const aenderungenFenster = document.getElementById("aenderungenFenster");
+        const aenderungenSchliessenButton = document.getElementById("aenderungenSchliessenButton");
+
+        const loginFenster = document.getElementById("loginFenster");
+        const loginEmailInput = document.getElementById("loginEmailInput");
+        const loginPasswortInput = document.getElementById("loginPasswortInput");
+        const loginButton = document.getElementById("loginButton");
+        const registerButton = document.getElementById("registerButton");
+
+        const einstellungenButton = document.getElementById("einstellungenButton");
+        const einstellungenFenster = document.getElementById("einstellungenFenster");
+        const einstellungenSchliessenButton = document.getElementById("einstellungenSchliessenButton");
+        const accountInfoBox = document.getElementById("accountInfoBox");
+        const cloudSpeichernButton = document.getElementById("cloudSpeichernButton");
+        const cloudLadenButton = document.getElementById("cloudLadenButton");
+        const accountWechselButton = document.getElementById("accountWechselButton");
+
+        const haustierButton = document.getElementById("haustierButton");
+        const haustierFenster = document.getElementById("haustierFenster");
+        const haustierSchliessenButton = document.getElementById("haustierSchliessenButton");
+        const haustierBox = document.getElementById("haustierBox");
+
+        const skinButton = document.getElementById("skinButton");
+        const skinFenster = document.getElementById("skinFenster");
+        const skinSchliessenButton = document.getElementById("skinSchliessenButton");
+        const skinBox = document.getElementById("skinBox");
+
+        const freundeButton = document.getElementById("freundeButton");
+        const freundeFenster = document.getElementById("freundeFenster");
+        const freundeSchliessenButton = document.getElementById("freundeSchliessenButton");
+        const freundUidInput = document.getElementById("freundUidInput");
+        const freundAnfrageButton = document.getElementById("freundAnfrageButton");
+        const freundeBox = document.getElementById("freundeBox");
+        const freundeLadenButton = document.getElementById("freundeLadenButton");
+
+        const tradingButton = document.getElementById("tradingButton");
+        const tradingFenster = document.getElementById("tradingFenster");
+        const tradingSchliessenButton = document.getElementById("tradingSchliessenButton");
+        const tradeUidInput = document.getElementById("tradeUidInput");
+        const tradeHolzInput = document.getElementById("tradeHolzInput");
+        const tradeSendenButton = document.getElementById("tradeSendenButton");
+        const tradeBox = document.getElementById("tradeBox");
+        const tradesLadenButton = document.getElementById("tradesLadenButton");
+
+        const prestigeButton = document.getElementById("prestigeButton");
+        const holzfaellerButton = document.getElementById("holzfaellerButton");
+        const foersterButton = document.getElementById("foersterButton");
+        const holzlagerButton = document.getElementById("holzlagerButton");
+        const saegewerkButton = document.getElementById("saegewerkButton");
+        const eichhoernchenButton = document.getElementById("eichhoernchenButton");
+        const biberButton = document.getElementById("biberButton");
+        const baerButton = document.getElementById("baerButton");
+        const axtButton = document.getElementById("axtButton");
+        const eisenAxtButton = document.getElementById("eisenAxtButton");
+        const goldAxtButton = document.getElementById("goldAxtButton");
+        const diamantAxtButton = document.getElementById("diamantAxtButton");
+        const motorsaegeButton = document.getElementById("motorsaegeButton");
+        const versicherungButton = document.getElementById("versicherungButton");
+        const statistikButton = document.getElementById("statistikButton");
+        const statistikBox = document.getElementById("statistikBox");
+        const spielerNameInput = document.getElementById("spielerNameInput");
+        const spielerNameSpeichernButton = document.getElementById("spielerNameSpeichernButton");
+        const spielerNameHinweis = document.getElementById("spielerNameHinweis");
+        const startFenster = document.getElementById("startFenster");
+        const startNameInput = document.getElementById("startNameInput");
+        const startNameSpeichernButton = document.getElementById("startNameSpeichernButton");
+        const bugButton = document.getElementById("bugButton");
+        const bugFenster = document.getElementById("bugFenster");
+        const bugSchliessenButton = document.getElementById("bugSchliessenButton");
+        const bugTextInput = document.getElementById("bugTextInput");
+        const bugSendenButton = document.getElementById("bugSendenButton");
+        const adminButton = document.getElementById("adminButton");
+        const adminFenster = document.getElementById("adminFenster");
+        const adminSchliessenButton = document.getElementById("adminSchliessenButton");
+        const adminInfoBox = document.getElementById("adminInfoBox");
+        const adminHolzButton = document.getElementById("adminHolzButton");
+        const adminVerwarnungEntfernenButton = document.getElementById("adminVerwarnungEntfernenButton");
+        const adminWetterButton = document.getElementById("adminWetterButton");
+        const bugListeLadenButton = document.getElementById("bugListeLadenButton");
+        const bugListeBox = document.getElementById("bugListeBox");
+        const luckyBlockButton = document.getElementById("luckyBlockButton");
+        const weltenbaumAnzeige = document.getElementById("weltenbaumAnzeige");
+        const adminResetButton = document.getElementById("adminResetButton");
+        const adminLuckyButton = document.getElementById("adminLuckyButton");
+        const adminRegenbogenButton = document.getElementById("adminRegenbogenButton");
+        const adminSamenButton = document.getElementById("adminSamenButton");
+
+        const adminHolzInput = document.getElementById("adminHolzInput");
+        const adminKlicksInput = document.getElementById("adminKlicksInput");
+        const adminGesamtHolzInput = document.getElementById("adminGesamtHolzInput");
+        const adminHPKInput = document.getElementById("adminHPKInput");
+        const adminHPSInput = document.getElementById("adminHPSInput");
+        const adminPrestigeInput = document.getElementById("adminPrestigeInput");
+        const adminVerwarnungInput = document.getElementById("adminVerwarnungInput");
+
+        const adminHolzSetzenButton = document.getElementById("adminHolzSetzenButton");
+        const adminHolzPlusButton = document.getElementById("adminHolzPlusButton");
+        const adminKlicksSetzenButton = document.getElementById("adminKlicksSetzenButton");
+        const adminKlicksPlusButton = document.getElementById("adminKlicksPlusButton");
+        const adminGesamtHolzSetzenButton = document.getElementById("adminGesamtHolzSetzenButton");
+        const adminHPKSetzenButton = document.getElementById("adminHPKSetzenButton");
+        const adminHPSSetzenButton = document.getElementById("adminHPSSetzenButton");
+        const adminPrestigeSetzenButton = document.getElementById("adminPrestigeSetzenButton");
+        const adminVerwarnungSetzenButton = document.getElementById("adminVerwarnungSetzenButton");
+        const updateFenster = document.getElementById("updateFenster");
+        const updateText = document.getElementById("updateText");
+        const updateJetztButton = document.getElementById("updateJetztButton");
+
+        laden();
+        offlineFortschrittBerechnen();
+        if (spielerName !== "Spieler") {
+            spielerNameInput.value = spielerName;
+            startNameInput.value = spielerName;
+        }
+        aktualisieren();
+        firebaseStarten();
+        loginFensterAnzeigen();
+        setInterval(versionPruefen, 60000);
+
+        updateJetztButton.addEventListener("click", function () {
+            location.reload();
+        });
+
+        loginButton.addEventListener("click", anmeldenMitEmail);
+        registerButton.addEventListener("click", registrierenMitEmail);
+        loginPasswortInput.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") anmeldenMitEmail();
+        });
+
+        cloudSpeichernButton.addEventListener("click", function () { cloudSpeichern(true); });
+        cloudLadenButton.addEventListener("click", cloudLaden);
+        accountWechselButton.addEventListener("click", accountWechseln);
+
+        baumButton.addEventListener("click", function (event) {
+            baumKlicken(event);
+        });
+
+        holzfaellerButton.addEventListener("click", function () {
+            upgradeKaufen("holzfaeller", holzfaellerKosten, 0, 1);
+        });
+
+        foersterButton.addEventListener("click", function () {
+            upgradeKaufen("foerster", foersterKosten, 0, 5);
+        });
+
+        holzlagerButton.addEventListener("click", function () {
+            upgradeKaufen("holzlager", holzlagerKosten, 0, 10);
+        });
+
+        saegewerkButton.addEventListener("click", function () {
+            upgradeKaufen("saegewerk", saegewerkKosten, 0, 25);
+        });
+
+        eichhoernchenButton.addEventListener("click", function () {
+            upgradeKaufen("eichhoernchen", eichhoernchenKosten, 0, 2);
+        });
+
+        biberButton.addEventListener("click", function () {
+            upgradeKaufen("biber", biberKosten, 0, 15);
+        });
+
+        baerButton.addEventListener("click", function () {
+            upgradeKaufen("baer", baerKosten, 0, 50);
+        });
+
+        axtButton.addEventListener("click", function () {
+            einmalKlickUpgradeKaufen("axt", 100, 1);
+        });
+
+        eisenAxtButton.addEventListener("click", function () {
+            einmalKlickUpgradeKaufen("eisenAxt", 750, 3);
+        });
+
+        motorsaegeButton.addEventListener("click", function () {
+            einmalKlickUpgradeKaufen("motorsaege", 1500, 10);
+        });
+
+        goldAxtButton.addEventListener("click", function () {
+            einmalKlickUpgradeKaufen("goldAxt", 2500, 8);
+        });
+
+        diamantAxtButton.addEventListener("click", function () {
+            einmalKlickUpgradeKaufen("diamantAxt", 7500, 20);
+        });
+
+        versicherungButton.addEventListener("click", function () {
+            if (holz >= 2000 && verwarnungen > 0) {
+                holz -= 2000;
+                verwarnungen--;
+                meldungAnzeigen("🛡️ Eine Verwarnung wurde entfernt!");
+                speichern();
+                aktualisieren();
+            } else if (verwarnungen === 0) {
+                meldungAnzeigen("🛡️ Du hast aktuell keine Verwarnung!");
+            } else {
+                fehlkauf();
+            }
+        });
+
+        luckyBlockButton.addEventListener("click", luckyBlockKaufen);
+
+        adminResetButton.addEventListener("click", function () {
+            if (!istAdmin) return;
+
+            const alterName = spielerName;
+            resetKomplettFuerAdmin();
+            spielerName = alterName;
+            spielerNameInput.value = spielerName;
+            startNameInput.value = spielerName;
+            speichern();
+            aktualisieren();
+            adminInfoAktualisieren();
+            meldungAnzeigen("👑 Admin: eigener Spielstand wurde zurückgesetzt.");
+        });
+
+        prestigeButton.addEventListener("click", function () {
+            const benoetigt = berechnePrestigeKosten();
+
+            if (gesamtHolz >= benoetigt) {
+                prestigePunkte++;
+                prestigeDurchgefuehrt++;
+
+                resetOhnePrestigeVerlust();
+
+                meldungAnzeigen("⭐ Prestige! +1 Prestige-Punkt");
+                speichern();
+                onlineSpeichern(true);
+                aktualisieren();
+            } else {
+                meldungAnzeigen("⭐ Prestige braucht " + benoetigt + " insgesamt verdientes Holz!");
+            }
+        });
+
+        shopOeffnenButton.addEventListener("click", function () {
+            shop.style.display = "block";
+            overlay.style.display = "block";
+            document.body.classList.add("fensterOffen");
+            aktualisieren();
+        });
+
+        hauptMenueButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+            hauptMenueDropdown.classList.toggle("menueOffen");
+        });
+
+        document.addEventListener("click", function (event) {
+            if (!hauptMenueDropdown.contains(event.target) && event.target !== hauptMenueButton) {
+                hauptMenueDropdown.classList.remove("menueOffen");
+            }
+        });
+
+        function hauptMenueSchliessen() {
+            hauptMenueDropdown.classList.remove("menueOffen");
+        }
+
+        aenderungenButton.addEventListener("click", function () {
+            hauptMenueSchliessen();
+            aenderungenFenster.style.display = "block";
+            overlay.style.display = "block";
+            document.body.classList.add("fensterOffen");
+        });
+
+        aenderungenSchliessenButton.addEventListener("click", alleFensterSchliessen);
+
+        einstellungenButton.addEventListener("click", function () {
+            hauptMenueSchliessen();
+            einstellungenAktualisieren();
+            einstellungenFenster.style.display = "block";
+            overlay.style.display = "block";
+            document.body.classList.add("fensterOffen");
+        });
+        einstellungenSchliessenButton.addEventListener("click", alleFensterSchliessen);
+
+        haustierButton.addEventListener("click", function () {
+            hauptMenueSchliessen();
+            haustiereAktualisieren();
+            haustierFenster.style.display = "block";
+            overlay.style.display = "block";
+            document.body.classList.add("fensterOffen");
+        });
+        haustierSchliessenButton.addEventListener("click", alleFensterSchliessen);
+
+        skinButton.addEventListener("click", function () {
+            hauptMenueSchliessen();
+            skinsAktualisieren();
+            skinFenster.style.display = "block";
+            overlay.style.display = "block";
+            document.body.classList.add("fensterOffen");
+        });
+        skinSchliessenButton.addEventListener("click", alleFensterSchliessen);
+
+        freundeButton.addEventListener("click", function () {
+            hauptMenueSchliessen();
+            freundeFenster.style.display = "block";
+            overlay.style.display = "block";
+            document.body.classList.add("fensterOffen");
+            freundeLaden();
+        });
+        freundeSchliessenButton.addEventListener("click", alleFensterSchliessen);
+        freundAnfrageButton.addEventListener("click", freundAnfrageSenden);
+        freundeLadenButton.addEventListener("click", freundeLaden);
+
+        tradingButton.addEventListener("click", function () {
+            hauptMenueSchliessen();
+            tradingFenster.style.display = "block";
+            overlay.style.display = "block";
+            document.body.classList.add("fensterOffen");
+            tradesLaden();
+        });
+        tradingSchliessenButton.addEventListener("click", alleFensterSchliessen);
+        tradeSendenButton.addEventListener("click", tradeSenden);
+        tradesLadenButton.addEventListener("click", tradesLaden);
+
+        achievementButton.addEventListener("click", function () {
+            hauptMenueSchliessen();
+            achievementFenster.style.display = "block";
+            overlay.style.display = "block";
+            document.body.classList.add("fensterOffen");
+            achievementListeAktualisieren();
+        });
+
+        wetterButton.addEventListener("click", function () {
+            hauptMenueSchliessen();
+            wetterFenster.style.display = "block";
+            overlay.style.display = "block";
+            document.body.classList.add("fensterOffen");
+            effektTabWechseln("wetter");
+            aktualisieren();
+        });
+
+        effektWetterTabButton.addEventListener("click", function () {
+            effektTabWechseln("wetter");
+        });
+
+        effektLuckyTabButton.addEventListener("click", function () {
+            effektTabWechseln("lucky");
+        });
+
+        ranglisteOeffnenButton.addEventListener("click", async function () {
+            hauptMenueSchliessen();
+            ranglisteFenster.style.display = "block";
+            overlay.style.display = "block";
+            document.body.classList.add("fensterOffen");
+            await ranglisteLaden();
+        });
+
+        shopSchliessenButton.addEventListener("click", alleFensterSchliessen);
+        wetterSchliessenButton.addEventListener("click", alleFensterSchliessen);
+        ranglisteSchliessenButton.addEventListener("click", alleFensterSchliessen);
+        achievementSchliessenButton.addEventListener("click", alleFensterSchliessen);
+        overlay.addEventListener("click", alleFensterSchliessen);
+
+        bugButton.addEventListener("click", function () {
+            hauptMenueSchliessen();
+            if (spielerName === "Spieler") {
+                pruefeNamensPflicht();
+                return;
+            }
+            bugFenster.style.display = "block";
+            overlay.style.display = "block";
+            document.body.classList.add("fensterOffen");
+        });
+
+        bugSchliessenButton.addEventListener("click", alleFensterSchliessen);
+        adminSchliessenButton.addEventListener("click", alleFensterSchliessen);
+
+        startNameSpeichernButton.addEventListener("click", function () {
+            nameSpeichernUndStarten(startNameInput.value);
+        });
+
+        startNameInput.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                nameSpeichernUndStarten(startNameInput.value);
+            }
+        });
+
+        bugSendenButton.addEventListener("click", bugReportSenden);
+
+        adminButton.addEventListener("click", function () {
+            if (!istAdmin) {
+                meldungAnzeigen("👑 Kein Admin-Zugriff.");
+                return;
+            }
+
+            adminFenster.style.display = "block";
+            overlay.style.display = "block";
+            document.body.classList.add("fensterOffen");
+            adminInfoAktualisieren();
+        });
+
+        adminHolzButton.addEventListener("click", function () {
+            if (!istAdmin) return;
+            holz += 10000;
+            gesamtHolz += 10000;
+            speichern();
+            onlineSpeichern(true);
+            aktualisieren();
+            adminInfoAktualisieren();
+            meldungAnzeigen("👑 Admin: +10.000 Holz");
+        });
+
+        adminVerwarnungEntfernenButton.addEventListener("click", function () {
+            if (!istAdmin) return;
+            verwarnungen = 0;
+            speichern();
+            aktualisieren();
+            adminInfoAktualisieren();
+            meldungAnzeigen("👑 Admin: Verwarnungen entfernt");
+        });
+
+        adminWetterButton.addEventListener("click", function () {
+            if (!istAdmin) return;
+            wetterCheck();
+        });
+
+        adminLuckyButton.addEventListener("click", function () {
+            if (!istAdmin) return;
+            luckyBlockAusloesen(false);
+            speichern();
+            aktualisieren();
+            adminInfoAktualisieren();
+        });
+
+        adminRegenbogenButton.addEventListener("click", function () {
+            if (!istAdmin) return;
+            goldenesRegenbogenWetter();
+            aktualisieren();
+            adminInfoAktualisieren();
+        });
+
+        adminSamenButton.addEventListener("click", function () {
+            if (!istAdmin) return;
+
+            if (weltenbaumSamen) {
+                weltenbaumSamen = false;
+                holzProSekunde = Math.max(0, holzProSekunde - 20);
+                meldungAnzeigen("👑 Admin: Weltenbaum-Samen entfernt.");
+            } else {
+                weltenbaumSamen = true;
+                holzProSekunde += 20;
+                meldungAnzeigen("👑 Admin: Weltenbaum-Samen gegeben.");
+            }
+
+            speichern();
+            aktualisieren();
+            adminInfoAktualisieren();
+        });
+
+        adminHolzSetzenButton.addEventListener("click", function () { adminWertSetzen("holz", adminHolzInput.value); });
+        adminHolzPlusButton.addEventListener("click", function () { adminWertAddieren("holz", adminHolzInput.value); });
+        adminKlicksSetzenButton.addEventListener("click", function () { adminWertSetzen("klicks", adminKlicksInput.value); });
+        adminKlicksPlusButton.addEventListener("click", function () { adminWertAddieren("klicks", adminKlicksInput.value); });
+        adminGesamtHolzSetzenButton.addEventListener("click", function () { adminWertSetzen("gesamtHolz", adminGesamtHolzInput.value); });
+        adminHPKSetzenButton.addEventListener("click", function () { adminWertSetzen("holzProKlick", adminHPKInput.value); });
+        adminHPSSetzenButton.addEventListener("click", function () { adminWertSetzen("holzProSekunde", adminHPSInput.value); });
+        adminPrestigeSetzenButton.addEventListener("click", function () { adminWertSetzen("prestigePunkte", adminPrestigeInput.value); });
+        adminVerwarnungSetzenButton.addEventListener("click", function () { adminWertSetzen("verwarnungen", adminVerwarnungInput.value); });
+
+        bugListeLadenButton.addEventListener("click", bugReportsLaden);
+
+        statistikButton.addEventListener("click", function () {
+            if (statistikBox.style.display === "block") {
+                statistikBox.style.display = "none";
+                statistikButton.textContent = "📊 Statistiken anzeigen";
+            } else {
+                statistikBox.style.display = "block";
+                statistikButton.textContent = "📊 Statistiken ausblenden";
+                aktualisieren();
+            }
+        });
+
+        spielerNameSpeichernButton.addEventListener("click", function () {
+            nameSpeichernUndStarten(spielerNameInput.value);
+        });
+
+        setInterval(function () {
+            const verdienst = berechneSekundenVerdienst();
+            holz += verdienst;
+            gesamtHolz += verdienst;
+
+            wetterTimer--;
+
+            if (wetterTimer <= 0) {
+                wetterCheck();
+                wetterTimer = WETTER_CHECK_SEKUNDEN;
+            }
+
+            wetterOptikAktualisieren();
+            speichern();
+            onlineSpeichern(false);
+            cloudSpeichern(false);
+            aktualisieren();
+        }, 1000);
+
+        function baumKlicken(event) {
+            if (spielerName === "Spieler") {
+                pruefeNamensPflicht();
+                return;
+            }
+
+            const jetzt = Date.now();
+
+            if (event && event.isTrusted === false) {
+                verdachtKlicks++;
+                antiCheatPruefen();
+                return;
+            }
+
+            if (letzterKlickZeitpunkt > 0 && jetzt - letzterKlickZeitpunkt < MIN_KLICK_ABSTAND_MS) {
+                verdachtKlicks++;
+                antiCheatPruefen();
+                return;
+            }
+
+            letzterKlickZeitpunkt = jetzt;
+            const verdienst = berechneKlickVerdienst();
+            klicks++;
+            gesamtKlicksAllzeit++;
+            holz += verdienst;
+            gesamtHolz += verdienst;
+            speichern();
+            onlineSpeichern(false);
+            aktualisieren();
+        }
+
+        function antiCheatPruefen() {
+            if (verdachtKlicks === 30) {
+                antiCheatWarnungen++;
+                meldungAnzeigen("🚫 Zu schnelle Klicks werden ignoriert!");
+            }
+
+            if (verdachtKlicks >= 120) {
+                verdachtKlicks = 0;
+                antiCheatWarnungen++;
+                meldungAnzeigen("🚫 Autoklicker-Verdacht! Verwarnung erhalten.");
+                fehlkauf();
+            }
+
+            speichern();
+            aktualisieren();
+        }
+
+        function alleFensterSchliessen() {
+            hauptMenueSchliessen();
+
+            if (!firebaseBereit && loginFenster.style.display === "block") {
+                meldungAnzeigen("☁️ Bitte zuerst anmelden oder registrieren.");
+                return;
+            }
+
+            if (spielerName === "Spieler" && startFenster.style.display === "block") {
+                meldungAnzeigen("🌳 Bitte zuerst einen Namen eingeben.");
+                return;
+            }
+
+            shop.style.display = "none";
+            wetterFenster.style.display = "none";
+            ranglisteFenster.style.display = "none";
+            achievementFenster.style.display = "none";
+            aenderungenFenster.style.display = "none";
+            einstellungenFenster.style.display = "none";
+            haustierFenster.style.display = "none";
+            skinFenster.style.display = "none";
+            freundeFenster.style.display = "none";
+            tradingFenster.style.display = "none";
+            bugFenster.style.display = "none";
+            adminFenster.style.display = "none";
+            overlay.classList.remove("pflichtOverlay");
+            overlay.style.display = "none";
+            document.body.classList.remove("fensterOffen");
+        }
+
+        function einmalKlickUpgradeKaufen(name, kosten, plusKlick) {
+            if (name === "axt" && axtGekauft) return;
+            if (name === "eisenAxt" && eisenAxtGekauft) return;
+            if (name === "motorsaege" && motorsaegeGekauft) return;
+            if (name === "goldAxt" && goldAxtGekauft) return;
+            if (name === "diamantAxt" && diamantAxtGekauft) return;
+
+            if (holz >= kosten) {
+                holz -= kosten;
+                holzProKlick += plusKlick;
+                gekaufteUpgrades++;
+
+                if (name === "axt") axtGekauft = true;
+                if (name === "eisenAxt") eisenAxtGekauft = true;
+                if (name === "motorsaege") motorsaegeGekauft = true;
+                if (name === "goldAxt") goldAxtGekauft = true;
+                if (name === "diamantAxt") diamantAxtGekauft = true;
+
+                speichern();
+                onlineSpeichern(false);
+                aktualisieren();
+            } else {
+                fehlkauf();
+            }
+        }
+
+        function effektTabWechseln(tab) {
+            if (tab === "wetter") {
+                effektWetterBereich.classList.add("aktiv");
+                effektLuckyBereich.classList.remove("aktiv");
+                effektWetterTabButton.classList.add("effektTabAktiv");
+                effektLuckyTabButton.classList.remove("effektTabAktiv");
+            } else {
+                effektLuckyBereich.classList.add("aktiv");
+                effektWetterBereich.classList.remove("aktiv");
+                effektLuckyTabButton.classList.add("effektTabAktiv");
+                effektWetterTabButton.classList.remove("effektTabAktiv");
+            }
+        }
+
+        function wetterOptikAktualisieren() {
+            if (aktivesWetter.includes("Regen")) {
+                if (Math.random() < 0.45) {
+                    const tropfen = document.createElement("div");
+                    tropfen.className = "regenTropfen";
+                    tropfen.textContent = "💧";
+                    tropfen.style.left = Math.floor(Math.random() * 100) + "vw";
+                    document.body.appendChild(tropfen);
+
+                    setTimeout(function () {
+                        tropfen.remove();
+                    }, 1500);
+                }
+            }
+
+            if (aktivesWetter.includes("Sturm") || aktivesWetter.includes("Gewitter")) {
+                if (Math.random() < 0.12) {
+                    const blitz = document.createElement("div");
+                    blitz.className = "blitzEffekt";
+                    document.body.appendChild(blitz);
+
+                    setTimeout(function () {
+                        blitz.remove();
+                    }, 300);
+                }
+            }
+
+            if (aktivesWetter.includes("Goldener Regenbogen")) {
+                if (!document.getElementById("regenbogenHintergrundEffekt")) {
+                    const regenbogen = document.createElement("div");
+                    regenbogen.id = "regenbogenHintergrundEffekt";
+                    regenbogen.className = "regenbogenEffekt";
+                    regenbogen.textContent = "🌈";
+                    document.body.appendChild(regenbogen);
+                }
+            } else {
+                const regenbogen = document.getElementById("regenbogenHintergrundEffekt");
+                if (regenbogen) regenbogen.remove();
+            }
+        }
+
+        function luckyBlockKaufen() {
+            if (klicks < LUCKY_BLOCK_KOSTEN_KLICKS) {
+                meldungAnzeigen("🎁 Lucky Block braucht " + LUCKY_BLOCK_KOSTEN_KLICKS + " Klicks!");
+                return;
+            }
+
+            klicks -= LUCKY_BLOCK_KOSTEN_KLICKS;
+            luckyBlockAusloesen(true);
+            speichern();
+            onlineSpeichern(false);
+            aktualisieren();
+        }
+
+        function luckyBlockAusloesen(gekauft) {
+            if (gekauft) {
+                luckyBlocksGekauft++;
+            }
+
+            const zufall = Math.random();
+
+            if (zufall < 0.20) {
+                luckyHolzBonusAnzahl++;
+                const bonusHolz = 500 + prestigePunkte * 100;
+                holz += bonusHolz;
+                gesamtHolz += bonusHolz;
+                meldungAnzeigen("🎁 Lucky Block: +" + bonusHolz + " Holz!");
+            } else if (zufall < 0.40) {
+                luckyBoosterAnzahl++;
+                luckyBoosterAktivieren();
+            } else if (zufall < 0.60) {
+                luckyGratisItemAnzahl++;
+                zufaelligesShopItem();
+            } else if (zufall < 0.75) {
+                goldenesRegenbogenWetter();
+            } else if (zufall < 0.90) {
+                if (!weltenbaumSamen) {
+                    luckyWeltenbaumAnzahl++;
+                    weltenbaumSamen = true;
+                    holzProSekunde += 20;
+                    meldungAnzeigen("💎 OP-Item gefunden: Weltenbaum-Samen! Dauerhaft +20/Sek.");
+                } else {
+                    const ersatzHolz = 2500;
+                    holz += ersatzHolz;
+                    gesamtHolz += ersatzHolz;
+                    meldungAnzeigen("💎 Weltenbaum-Samen schon vorhanden: +" + ersatzHolz + " Holz!");
+                }
+            } else if (zufall < 0.98) {
+                luckyPrestigeAnzahl++;
+                prestigePunkte++;
+                meldungAnzeigen("⭐ Lucky Block: +1 Prestige-Punkt!");
+            } else {
+                luckyPechAnzahl++;
+                verwarnungGeben("⚠️ Lucky Block Pech! +1 Verwarnung.");
+            }
+
+            achievementPruefen();
+        }
+
+        function luckyBoosterAktivieren() {
+            luckyBoosterAktiv = true;
+            luckyBonusKlick = 1.15;
+            luckyBonusSekunde = 1.15;
+            meldungAnzeigen("🚀 Lucky Booster! 60 Sekunden +15% auf Holz!");
+
+            setTimeout(function () {
+                luckyBoosterAktiv = false;
+                luckyBonusKlick = 1;
+                luckyBonusSekunde = 1;
+                speichern();
+                aktualisieren();
+            }, 60000);
+        }
+
+        function goldenesRegenbogenWetter() {
+            luckySpezialwetterAnzahl++;
+            aktivesWetter = "🌈 Goldener Regenbogen: x2 Ertrag";
+            wetterIcon.textContent = "🌈";
+            wetterBonusKlick = 2;
+            wetterBonusSekunde = 2;
+            meldungAnzeigen("🌈 GOLDENER REGENBOGEN! 60 Sekunden doppelter Ertrag!");
+
+            setTimeout(function () {
+                wetterBonusKlick = 1;
+                wetterBonusSekunde = 1;
+                aktivesWetter = "Kein Wetter";
+                wetterIcon.textContent = "🌤️";
+                speichern();
+                aktualisieren();
+            }, 60000);
+        }
+
+        function zufaelligesShopItem() {
+            const moeglicheItems = [];
+
+            if (!axtGekauft) moeglicheItems.push("axt");
+            if (!eisenAxtGekauft) moeglicheItems.push("eisenAxt");
+            if (!motorsaegeGekauft) moeglicheItems.push("motorsaege");
+            if (!goldAxtGekauft) moeglicheItems.push("goldAxt");
+            if (!diamantAxtGekauft) moeglicheItems.push("diamantAxt");
+
+            moeglicheItems.push("holzfaeller", "foerster", "holzlager", "saegewerk", "eichhoernchen", "biber", "baer");
+
+            const item = moeglicheItems[Math.floor(Math.random() * moeglicheItems.length)];
+
+            if (item === "axt") { axtGekauft = true; holzProKlick += 1; meldungAnzeigen("🎁 Gratis-Item: Bessere Axt!"); }
+            if (item === "eisenAxt") { eisenAxtGekauft = true; holzProKlick += 3; meldungAnzeigen("🎁 Gratis-Item: Eisen-Axt!"); }
+            if (item === "motorsaege") { motorsaegeGekauft = true; holzProKlick += 10; meldungAnzeigen("🎁 Gratis-Item: Motorsäge!"); }
+            if (item === "goldAxt") { goldAxtGekauft = true; holzProKlick += 8; meldungAnzeigen("🎁 Gratis-Item: Gold-Axt!"); }
+            if (item === "diamantAxt") { diamantAxtGekauft = true; holzProKlick += 20; meldungAnzeigen("🎁 Gratis-Item: Diamant-Axt!"); }
+
+            if (item === "holzfaeller") { holzProSekunde += 1; holzfaellerKosten = Math.floor(holzfaellerKosten * 1.4); meldungAnzeigen("🎁 Gratis-Item: Holzfäller!"); }
+            if (item === "foerster") { holzProSekunde += 5; foersterKosten = Math.floor(foersterKosten * 1.4); meldungAnzeigen("🎁 Gratis-Item: Förster!"); }
+            if (item === "holzlager") { holzProSekunde += 10; holzlagerKosten = Math.floor(holzlagerKosten * 1.4); meldungAnzeigen("🎁 Gratis-Item: Holzlager!"); }
+            if (item === "saegewerk") { holzProSekunde += 25; saegewerkKosten = Math.floor(saegewerkKosten * 1.4); meldungAnzeigen("🎁 Gratis-Item: Sägewerk!"); }
+            if (item === "eichhoernchen") { holzProSekunde += 2; eichhoernchenKosten = Math.floor(eichhoernchenKosten * 1.45); meldungAnzeigen("🎁 Gratis-Item: Eichhörnchen!"); }
+            if (item === "biber") { holzProSekunde += 15; biberKosten = Math.floor(biberKosten * 1.45); meldungAnzeigen("🎁 Gratis-Item: Biber!"); }
+            if (item === "baer") { holzProSekunde += 50; baerKosten = Math.floor(baerKosten * 1.45); meldungAnzeigen("🎁 Gratis-Item: Bär!"); }
+
+            gekaufteUpgrades++;
+        }
+
+        function wetterCheck() {
+            const chance = Math.random();
+
+            if (chance <= WETTER_CHANCE) {
+                wetterEreignisse++;
+                const wetterListe = ["sonne", "regen", "sturm", "wind"];
+                const zufall = wetterListe[Math.floor(Math.random() * wetterListe.length)];
+
+                if (zufall === "sonne") {
+                    sonneAnzahl++;
+                    aktivesWetter = "☀️ Sonne: +20% Klick";
+                    wetterIcon.textContent = "☀️";
+                    wetterBonusKlick = 1.2;
+                    meldungAnzeigen("☀️ Sonne! 60 Sekunden +20% Holz pro Klick!");
+
+                    setTimeout(function () {
+                        wetterBonusKlick = 1;
+                        aktivesWetter = "Kein Wetter";
+                        wetterIcon.textContent = "🌤️";
+                        speichern();
+                        aktualisieren();
+                    }, 60000);
+                }
+
+                if (zufall === "regen") {
+                    regenAnzahl++;
+                    aktivesWetter = "🌧️ Regen: +50% Sekunde";
+                    wetterIcon.textContent = "🌧️";
+                    wetterBonusSekunde = 1.5;
+                    meldungAnzeigen("🌧️ Regen! 60 Sekunden +50% Holz pro Sekunde!");
+
+                    setTimeout(function () {
+                        wetterBonusSekunde = 1;
+                        aktivesWetter = "Kein Wetter";
+                        wetterIcon.textContent = "🌤️";
+                        speichern();
+                        aktualisieren();
+                    }, 60000);
+                }
+
+                if (zufall === "sturm") {
+                    sturmAnzahl++;
+                    aktivesWetter = "⛈️ Sturm: +1 Verwarnung";
+                    wetterIcon.textContent = "⛈️";
+                    verwarnungGeben("⛈️ Sturm! Du bekommst eine Verwarnung!");
+
+                    setTimeout(function () {
+                        aktivesWetter = "Kein Wetter";
+                        wetterIcon.textContent = "🌤️";
+                        speichern();
+                        aktualisieren();
+                    }, 60000);
+                }
+
+                if (zufall === "wind") {
+                    windAnzahl++;
+                    let bonusHolz = 100 + prestigePunkte * 50;
+                    aktivesWetter = "🍃 Wind: +" + bonusHolz + " Holz";
+                    wetterIcon.textContent = "🍃";
+                    holz += bonusHolz;
+                    gesamtHolz += bonusHolz;
+                    meldungAnzeigen("🍃 Wind! +" + bonusHolz + " Holz!");
+
+                    setTimeout(function () {
+                        aktivesWetter = "Kein Wetter";
+                        wetterIcon.textContent = "🌤️";
+                        speichern();
+                        aktualisieren();
+                    }, 60000);
+                }
+            } else {
+                keinWetterAnzahl++;
+                aktivesWetter = "Kein Wetter";
+                wetterIcon.textContent = "🌤️";
+                meldungAnzeigen("🌦️ Kein Wetter passiert.");
+            }
+
+            speichern();
+            aktualisieren();
+        }
+
+        function berechnePrestigeBonus() {
+            return 1 + (prestigePunkte * 0.10);
+        }
+
+        function berechnePrestigeKosten() {
+            return 2000 * (prestigePunkte + 1);
+        }
+
+        function berechneKlickVerdienst() {
+            return Math.floor(holzProKlick * berechnePrestigeBonus() * wetterBonusKlick * luckyBonusKlick * berechneHaustierKlickBonus());
+        }
+
+        function berechneSekundenVerdienst() {
+            return Math.floor(holzProSekunde * berechnePrestigeBonus() * wetterBonusSekunde * luckyBonusSekunde * berechneHaustierSekundenBonus());
+        }
+
+        function upgradeKaufen(name, kosten, plusKlick, plusSekunde) {
+            if (holz >= kosten) {
+                holz -= kosten;
+                holzProKlick += plusKlick;
+                holzProSekunde += plusSekunde;
+                gekaufteUpgrades++;
+
+                if (name === "holzfaeller") holzfaellerKosten = Math.floor(holzfaellerKosten * 1.4);
+                if (name === "foerster") foersterKosten = Math.floor(foersterKosten * 1.4);
+                if (name === "holzlager") holzlagerKosten = Math.floor(holzlagerKosten * 1.4);
+                if (name === "saegewerk") saegewerkKosten = Math.floor(saegewerkKosten * 1.4);
+
+                if (name === "eichhoernchen") eichhoernchenKosten = Math.floor(eichhoernchenKosten * 1.45);
+                if (name === "biber") biberKosten = Math.floor(biberKosten * 1.45);
+                if (name === "baer") baerKosten = Math.floor(baerKosten * 1.45);
+
+                speichern();
+                onlineSpeichern(false);
+                aktualisieren();
+            } else {
+                fehlkauf();
+            }
+        }
+
+        function verwarnungGeben(text) {
+            verwarnungen++;
+            fehlkaeufeGesamt++;
+            speichern();
+            aktualisieren();
+
+            if (verwarnungen < 3) {
+                meldungAnzeigen(text + " (" + verwarnungen + "/3)");
+            } else {
+                meldung.textContent = "💀 3. Verwarnung! Spiel wird zurückgesetzt!";
+                meldung.style.display = "block";
+
+                setTimeout(function () {
+                    meldung.style.display = "none";
+                    resetSpiel(true);
+                }, 3000);
+            }
+        }
+
+        function fehlkauf() {
+            verwarnungen++;
+            fehlkaeufeGesamt++;
+            speichern();
+            aktualisieren();
+
+            if (verwarnungen < 3) {
+                meldungAnzeigen("⚠️ Leider kein Geld! Verwarnung " + verwarnungen + "/3");
+            } else {
+                meldung.textContent = "💀 3. Verwarnung! Spiel wird zurückgesetzt!";
+                meldung.style.display = "block";
+
+                setTimeout(function () {
+                    meldung.style.display = "none";
+                    resetSpiel(true);
+                }, 3000);
+            }
+        }
+
+        function resetSpiel(istTod) {
+            resetOhnePrestigeVerlust();
+
+            if (istTod === true) {
+                prestigePunkte = 0;
+                onlineZuruecksetzen();
+            }
+
+            speichern();
+            aktualisieren();
+        }
+
+        function resetOhnePrestigeVerlust() {
+            const weltenbaumBleibt = weltenbaumSamen;
+
+            klicks = 0;
+            holz = 0;
+            gesamtHolz = 0;
+            holzProKlick = 1;
+            holzProSekunde = weltenbaumBleibt ? 20 : 0;
+            verwarnungen = 0;
+
+            axtGekauft = false;
+            eisenAxtGekauft = false;
+            goldAxtGekauft = false;
+            diamantAxtGekauft = false;
+            motorsaegeGekauft = false;
+
+            holzfaellerKosten = 50;
+            foersterKosten = 250;
+            holzlagerKosten = 500;
+            saegewerkKosten = 1000;
+
+            eichhoernchenKosten = 750;
+            biberKosten = 2500;
+            baerKosten = 8000;
+
+            aktivesWetter = "Kein Wetter";
+            wetterBonusKlick = 1;
+            wetterBonusSekunde = 1;
+            wetterIcon.textContent = "🌤️";
+            verdachtKlicks = 0;
+            antiCheatWarnungen = 0;
+        }
+
+        function resetKomplettFuerAdmin() {
+            resetOhnePrestigeVerlust();
+            prestigePunkte = 0;
+            gesamtKlicksAllzeit = 0;
+            gekaufteUpgrades = 0;
+            fehlkaeufeGesamt = 0;
+            wetterEreignisse = 0;
+            prestigeDurchgefuehrt = 0;
+            sonneAnzahl = 0;
+            regenAnzahl = 0;
+            sturmAnzahl = 0;
+            windAnzahl = 0;
+            keinWetterAnzahl = 0;
+            luckyBoosterAktiv = false;
+            luckyBonusKlick = 1;
+            luckyBonusSekunde = 1;
+            weltenbaumSamen = false;
+            luckyBlocksGekauft = 0;
+            luckySpezialwetterAnzahl = 0;
+            luckyHolzBonusAnzahl = 0;
+            luckyBoosterAnzahl = 0;
+            luckyGratisItemAnzahl = 0;
+            luckyWeltenbaumAnzahl = 0;
+            luckyPrestigeAnzahl = 0;
+            luckyPechAnzahl = 0;
+            achievements = {};
+            letzterSpeicherZeitpunkt = Date.now();
+            holzProSekunde = 0;
+            aktiveHaustiere = {};
+            aktiverSkin = "standard";
+            gekaufteSkins = { standard: true };
+            onlineZuruecksetzen();
+        }
+
+        function meldungAnzeigen(text) {
+            meldung.textContent = text;
+            meldung.style.display = "block";
+
+            setTimeout(function () {
+                meldung.style.display = "none";
+            }, 3000);
+        }
+
+        function speichern() {
+            letzterSpeicherZeitpunkt = Date.now();
+
+            const spielstand = {
+                klicks, holz, gesamtHolz, holzProKlick, holzProSekunde,
+                verwarnungen, prestigePunkte,
+                axtGekauft, eisenAxtGekauft, goldAxtGekauft, diamantAxtGekauft, motorsaegeGekauft,
+                holzfaellerKosten, foersterKosten, holzlagerKosten, saegewerkKosten,
+                eichhoernchenKosten, biberKosten, baerKosten,
+                wetterTimer, gesamtKlicksAllzeit, gekaufteUpgrades,
+                fehlkaeufeGesamt, wetterEreignisse, prestigeDurchgefuehrt,
+                sonneAnzahl, regenAnzahl, sturmAnzahl, windAnzahl, keinWetterAnzahl,
+                spielerName, verdachtKlicks, antiCheatWarnungen,
+                luckyBoosterAktiv, luckyBonusKlick, luckyBonusSekunde,
+                weltenbaumSamen, luckyBlocksGekauft, luckySpezialwetterAnzahl,
+                letzterSpeicherZeitpunkt,
+                luckyHolzBonusAnzahl, luckyBoosterAnzahl, luckyGratisItemAnzahl,
+                luckyWeltenbaumAnzahl, luckyPrestigeAnzahl, luckyPechAnzahl,
+                achievements,
+                aktiveHaustiere, aktiverSkin, gekaufteSkins
+            };
+
+            localStorage.setItem(SAVE_KEY, JSON.stringify(spielstand));
+        }
+
+        function laden() {
+            const gespeicherterStand = localStorage.getItem(SAVE_KEY);
+
+            if (gespeicherterStand) {
+                const spielstand = JSON.parse(gespeicherterStand);
+
+                klicks = spielstand.klicks || 0;
+                holz = spielstand.holz || 0;
+                gesamtHolz = spielstand.gesamtHolz || 0;
+                holzProKlick = spielstand.holzProKlick || 1;
+                holzProSekunde = spielstand.holzProSekunde || 0;
+                verwarnungen = spielstand.verwarnungen || 0;
+                prestigePunkte = spielstand.prestigePunkte || 0;
+
+                axtGekauft = spielstand.axtGekauft || false;
+                eisenAxtGekauft = spielstand.eisenAxtGekauft || false;
+                goldAxtGekauft = spielstand.goldAxtGekauft || false;
+                diamantAxtGekauft = spielstand.diamantAxtGekauft || false;
+                motorsaegeGekauft = spielstand.motorsaegeGekauft || false;
+
+                holzfaellerKosten = spielstand.holzfaellerKosten || 50;
+                foersterKosten = spielstand.foersterKosten || 250;
+                holzlagerKosten = spielstand.holzlagerKosten || 500;
+                saegewerkKosten = spielstand.saegewerkKosten || 1000;
+
+                eichhoernchenKosten = spielstand.eichhoernchenKosten || 750;
+                biberKosten = spielstand.biberKosten || 2500;
+                baerKosten = spielstand.baerKosten || 8000;
+
+                wetterTimer = spielstand.wetterTimer || WETTER_CHECK_SEKUNDEN;
+                gesamtKlicksAllzeit = spielstand.gesamtKlicksAllzeit || 0;
+                gekaufteUpgrades = spielstand.gekaufteUpgrades || 0;
+                fehlkaeufeGesamt = spielstand.fehlkaeufeGesamt || 0;
+                wetterEreignisse = spielstand.wetterEreignisse || 0;
+                prestigeDurchgefuehrt = spielstand.prestigeDurchgefuehrt || 0;
+
+                sonneAnzahl = spielstand.sonneAnzahl || 0;
+                regenAnzahl = spielstand.regenAnzahl || 0;
+                sturmAnzahl = spielstand.sturmAnzahl || 0;
+                windAnzahl = spielstand.windAnzahl || 0;
+                keinWetterAnzahl = spielstand.keinWetterAnzahl || 0;
+
+                spielerName = spielstand.spielerName || "Spieler";
+                verdachtKlicks = spielstand.verdachtKlicks || 0;
+                antiCheatWarnungen = spielstand.antiCheatWarnungen || 0;
+                luckyBoosterAktiv = spielstand.luckyBoosterAktiv || false;
+                luckyBonusKlick = spielstand.luckyBonusKlick || 1;
+                luckyBonusSekunde = spielstand.luckyBonusSekunde || 1;
+                weltenbaumSamen = spielstand.weltenbaumSamen || false;
+                luckyBlocksGekauft = spielstand.luckyBlocksGekauft || 0;
+                luckySpezialwetterAnzahl = spielstand.luckySpezialwetterAnzahl || 0;
+                letzterSpeicherZeitpunkt = spielstand.letzterSpeicherZeitpunkt || Date.now();
+
+                luckyHolzBonusAnzahl = spielstand.luckyHolzBonusAnzahl || 0;
+                luckyBoosterAnzahl = spielstand.luckyBoosterAnzahl || 0;
+                luckyGratisItemAnzahl = spielstand.luckyGratisItemAnzahl || 0;
+                luckyWeltenbaumAnzahl = spielstand.luckyWeltenbaumAnzahl || 0;
+                luckyPrestigeAnzahl = spielstand.luckyPrestigeAnzahl || 0;
+                luckyPechAnzahl = spielstand.luckyPechAnzahl || 0;
+                achievements,
+                aktiveHaustiere, aktiverSkin, gekaufteSkins = spielstand.achievements || {};
+            }
+        }
+
+        function formatiereZeit(sekunden) {
+            let minuten = Math.floor(sekunden / 60);
+            let restSekunden = sekunden % 60;
+
+            if (restSekunden < 10) {
+                restSekunden = "0" + restSekunden;
+            }
+
+            return minuten + ":" + restSekunden;
+        }
+
+        function aktualisieren() {
+            if (klicks >= 1000) {
+                baumAnzeige.textContent = "🌌";
+            } else if (klicks >= 500) {
+                baumAnzeige.textContent = "🏞️";
+            } else if (klicks >= 250) {
+                baumAnzeige.textContent = "🌲🌲🌲";
+            } else if (klicks >= 100) {
+                baumAnzeige.textContent = "🎄";
+            } else if (klicks >= 50) {
+                baumAnzeige.textContent = "🌲";
+            } else if (klicks >= 25) {
+                baumAnzeige.textContent = "🌳";
+            } else if (klicks >= 10) {
+                baumAnzeige.textContent = "🌿";
+            } else {
+                baumAnzeige.textContent = "🌱";
+            }
+
+            if (aktiverSkin !== "standard") {
+                const skinEmoji = { winter: "🎄", gold: "🌟", sakura: "🌸", weltenbaum: "💎🌳" };
+                baumAnzeige.textContent = skinEmoji[aktiverSkin] || baumAnzeige.textContent;
+            }
+
+            klickAnzeige.textContent = "Klicks: " + klicks;
+            holzAnzeige.textContent = "🪵 Holz: " + holz;
+            shopHolzAnzeige.textContent = "🪵 Holz: " + holz;
+            gesamtHolzAnzeige.textContent = "📦 Gesamt verdient: " + gesamtHolz;
+            holzProKlickAnzeige.textContent = "👆 Holz pro Klick: " + berechneKlickVerdienst();
+            holzProSekundeAnzeige.textContent = "⏱️ Holz pro Sekunde: " + berechneSekundenVerdienst();
+            prestigeAnzeige.textContent = "⭐ Prestige: " + prestigePunkte + " | Bonus: " + (prestigePunkte * 10) + "%";
+            wetterAnzeige.textContent = "🌦️ Wetter in: " + formatiereZeit(wetterTimer) + " | " + aktivesWetter;
+            verwarnungAnzeige.textContent = "⚠️ Verwarnungen: " + verwarnungen + "/3";
+
+            if (document.activeElement !== spielerNameInput) {
+                spielerNameInput.value = spielerName === "Spieler" ? "" : spielerName;
+            }
+            if (document.activeElement !== startNameInput) {
+                startNameInput.value = spielerName === "Spieler" ? startNameInput.value : spielerName;
+            }
+            spielerNameHinweis.textContent = spielerName === "Spieler" ? "Name wird für die Online-Rangliste genutzt." : "Gespeichert als: " + spielerName;
+
+            holzfaellerButton.textContent = "🪓 Holzfäller (" + holzfaellerKosten + " Holz) +1/Sek";
+            foersterButton.textContent = "🌲 Förster (" + foersterKosten + " Holz) +5/Sek";
+            holzlagerButton.textContent = "🏕️ Holzlager (" + holzlagerKosten + " Holz) +10/Sek";
+            saegewerkButton.textContent = "🏭 Sägewerk (" + saegewerkKosten + " Holz) +25/Sek";
+
+            eichhoernchenButton.textContent = "🐿️ Eichhörnchen (" + eichhoernchenKosten + " Holz) +2/Sek";
+            biberButton.textContent = "🦫 Biber (" + biberKosten + " Holz) +15/Sek";
+            baerButton.textContent = "🐻 Bär (" + baerKosten + " Holz) +50/Sek";
+
+            updateEinmalButton(axtButton, axtGekauft, "🔨 Bessere Axt (100 Holz) +1/Klick", "🔨 Bessere Axt: GEKAUFT");
+            updateEinmalButton(eisenAxtButton, eisenAxtGekauft, "⛏️ Eisen-Axt (750 Holz) +3/Klick", "⛏️ Eisen-Axt: GEKAUFT");
+            updateEinmalButton(motorsaegeButton, motorsaegeGekauft, "⚡ Motorsäge (1500 Holz) +10/Klick", "⚡ Motorsäge: GEKAUFT");
+            updateEinmalButton(goldAxtButton, goldAxtGekauft, "🟡 Gold-Axt (2500 Holz) +8/Klick", "🟡 Gold-Axt: GEKAUFT");
+            updateEinmalButton(diamantAxtButton, diamantAxtGekauft, "💎 Diamant-Axt (7500 Holz) +20/Klick", "💎 Diamant-Axt: GEKAUFT");
+
+            prestigeButton.textContent = "⭐ Prestige durchführen (" + berechnePrestigeKosten() + " Gesamt-Holz)";
+            prestigeButton.style.display = gesamtHolz >= berechnePrestigeKosten() ? "inline-block" : "none";
+
+            luckyBlockButton.textContent = "🎁 Lucky Block kaufen (" + LUCKY_BLOCK_KOSTEN_KLICKS + " Klicks)";
+            luckyBlockButton.disabled = klicks < LUCKY_BLOCK_KOSTEN_KLICKS;
+            weltenbaumAnzeige.textContent = weltenbaumSamen
+                ? "💎 Weltenbaum-Samen: aktiv (+20 Holz/Sek, bleibt nach Prestige)"
+                : "💎 Weltenbaum-Samen: noch nicht gefunden";
+
+            statistikBox.innerHTML =
+                "🌳 Aktuelle Klicks: " + klicks + "<br>" +
+                "👆 Klicks insgesamt: " + gesamtKlicksAllzeit + "<br>" +
+                "🪵 Aktuelles Holz: " + holz + "<br>" +
+                "📦 Gesamt verdient: " + gesamtHolz + "<br>" +
+                "🛒 Gekaufte Upgrades: " + gekaufteUpgrades + "<br>" +
+                "⚠️ Fehlkäufe insgesamt: " + fehlkaeufeGesamt + "<br>" +
+                "🚫 Anti-Cheat-Warnungen: " + antiCheatWarnungen + "<br>" +
+                "🌦️ Wetter-Ereignisse: " + wetterEreignisse + "<br>" +
+                "⭐ Prestige durchgeführt: " + prestigeDurchgefuehrt + "<br>" +
+                "🎁 Lucky Blocks gekauft: " + luckyBlocksGekauft + "<br>" +
+                "💎 Weltenbaum-Samen: " + (weltenbaumSamen ? "Ja" : "Nein") + "<br>" +
+                "🌈 Goldene Regenbogen: " + luckySpezialwetterAnzahl + "<br><br>" +
+                "<b>🎁 Lucky-Block-Statistik</b><br>" +
+                "🪵 Holzbonus: " + luckyHolzBonusAnzahl + "<br>" +
+                "🚀 Booster: " + luckyBoosterAnzahl + "<br>" +
+                "🎁 Gratis-Item: " + luckyGratisItemAnzahl + "<br>" +
+                "🌈 Spezialwetter: " + luckySpezialwetterAnzahl + "<br>" +
+                "💎 Weltenbaum: " + luckyWeltenbaumAnzahl + "<br>" +
+                "⭐ Prestige-Bonus: " + luckyPrestigeAnzahl + "<br>" +
+                "⚠️ Pech: " + luckyPechAnzahl + "<br><br>" +
+                "<b>🌦️ Wetter-Statistik</b><br>" +
+                "☀️ Sonne: " + sonneAnzahl + "<br>" +
+                "🌧️ Regen: " + regenAnzahl + "<br>" +
+                "⛈️ Sturm: " + sturmAnzahl + "<br>" +
+                "🍃 Wind: " + windAnzahl + "<br>" +
+                "🌤️ Kein Wetter: " + keinWetterAnzahl + "<br>" +
+                "🌈 Goldener Regenbogen: " + luckySpezialwetterAnzahl;
+
+            wetterBox.innerHTML =
+                "<b>Aktives Wetter:</b> " + aktivesWetter + "<br>" +
+                "<b>Nächster Check:</b> " + formatiereZeit(wetterTimer) + "<br><br>" +
+                "<b>Grundcheck:</b> Alle 5 Minuten<br>" +
+                "<b>Wetterchance:</b> 30% pro Check<br>" +
+                "<b>Wenn Wetter passiert:</b> Jede normale Wetterart hat 25% Chance<br><br>" +
+                "<b>🌦️ Wettereffekte:</b><br>" +
+                "☀️ Sonne: +20% Holz pro Klick für 60 Sekunden — bisher " + sonneAnzahl + "x<br>" +
+                "🌧️ Regen: +50% Holz pro Sekunde für 60 Sekunden — bisher " + regenAnzahl + "x<br>" +
+                "⛈️ Sturm: +1 Verwarnung — bisher " + sturmAnzahl + "x<br>" +
+                "🍃 Wind: Sofort Bonus-Holz — bisher " + windAnzahl + "x<br>" +
+                "🌤️ Kein Wetter: Nichts passiert — bisher " + keinWetterAnzahl + "x<br><br>" +
+                "<b>Lucky-Block-Spezialwetter:</b><br>" +
+                "🌈 Goldener Regenbogen: 60 Sekunden doppelter Klick- und Sekunden-Ertrag — bisher " + luckySpezialwetterAnzahl + "x";
+
+            luckyEffektBox.innerHTML =
+                "<b>🎁 Lucky Block</b><br>" +
+                "<b>Kosten:</b> " + LUCKY_BLOCK_KOSTEN_KLICKS + " Klicks<br><br>" +
+                "<b>Mögliche Effekte:</b><br>" +
+                "🪵 Holzbonus: Sofort-Holz, steigt mit Prestige — bisher " + luckyHolzBonusAnzahl + "x<br>" +
+                "🚀 Lucky Booster: 60 Sekunden +15% auf Klick- und Sekunden-Ertrag — bisher " + luckyBoosterAnzahl + "x<br>" +
+                "🎁 Gratis-Item: Ein zufälliges Shop-Item kostenlos — bisher " + luckyGratisItemAnzahl + "x<br>" +
+                "🌈 Goldener Regenbogen: Spezialwetter mit doppeltem Ertrag — bisher " + luckySpezialwetterAnzahl + "x<br>" +
+                "💎 Weltenbaum-Samen: dauerhaft +20 Holz/Sekunde, bleibt nach Prestige — bisher " + luckyWeltenbaumAnzahl + "x<br>" +
+                "⭐ Prestige-Bonus: +1 Prestige-Punkt — bisher " + luckyPrestigeAnzahl + "x<br>" +
+                "⚠️ Pech: +1 Verwarnung — bisher " + luckyPechAnzahl + "x";
+
+            achievementPruefen();
+        }
+
+        function updateEinmalButton(button, gekauft, normalText, gekauftText) {
+            if (gekauft) {
+                button.disabled = true;
+                button.textContent = gekauftText;
+            } else {
+                button.disabled = false;
+                button.textContent = normalText;
+            }
+        }
+
+
+
+        function pruefeNamensPflicht() {
+            if (spielerName === "Spieler") {
+                startFenster.style.display = "block";
+                overlay.style.display = "block";
+                document.body.classList.add("fensterOffen");
+                overlay.classList.add("pflichtOverlay");
+                startNameInput.focus();
+            }
+        }
+
+
+        function nameSpeichernUndStarten(nameAusInput) {
+            const neuerName = String(nameAusInput || "").trim().substring(0, 18);
+
+            if (neuerName.length < 2) {
+                meldungAnzeigen("☁️ Bitte gib mindestens 2 Zeichen ein.");
+                return;
+            }
+
+            spielerName = neuerName;
+            spielerNameInput.value = spielerName;
+            startNameInput.value = spielerName;
+            spielerNameHinweis.textContent = "Gespeichert als: " + spielerName;
+            speichern();
+            onlineSpeichern(true);
+            startFenster.style.display = "none";
+            overlay.classList.remove("pflichtOverlay");
+            alleFensterSchliessen();
+            meldungAnzeigen("☁️ Name gespeichert!");
+        }
+
+
+        async function bugReportSenden() {
+            if (!firebaseBereit || !spielerId) {
+                meldungAnzeigen("🐞 Online-Verbindung fehlt. Bitte später erneut versuchen.");
+                return;
+            }
+
+            if (spielerName === "Spieler") {
+                pruefeNamensPflicht();
+                return;
+            }
+
+            const jetzt = Date.now();
+            if (jetzt - letzterBugReport < 120000) {
+                meldungAnzeigen("🐞 Bitte warte kurz, bevor du noch eine Meldung sendest.");
+                return;
+            }
+
+            const text = bugTextInput.value.trim();
+            if (text.length < 10) {
+                meldungAnzeigen("🐞 Bitte beschreibe den Fehler mit mindestens 10 Zeichen.");
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, "bugReports"), {
+                    name: spielerName,
+                    spielerId: spielerId,
+                    text: text.substring(0, 500),
+                    holz: holz,
+                    gesamtHolz: gesamtHolz,
+                    prestige: prestigePunkte,
+                    klicks: klicks,
+                    userAgent: navigator.userAgent,
+                    erledigt: false,
+                    erstelltAm: serverTimestamp()
+                });
+
+                letzterBugReport = jetzt;
+                bugTextInput.value = "";
+                alleFensterSchliessen();
+                meldungAnzeigen("🐞 Danke! Fehler wurde gemeldet.");
+            } catch (error) {
+                meldungAnzeigen("🐞 Fehler konnte nicht gesendet werden.");
+                console.error(error);
+            }
+        }
+
+
+        function adminInfoAktualisieren() {
+            if (!istAdmin) return;
+
+            adminInfoBox.innerHTML =
+                "<b>Deine Firebase-UID:</b><br>" + sichererText(spielerId || "noch nicht verbunden") + "<br><br>" +
+                "<b>Aktuelle Werte:</b><br>" +
+                "Klicks: " + klicks + "<br>" +
+                "Holz: " + holz + "<br>" +
+                "Gesamt-Holz: " + gesamtHolz + "<br>" +
+                "HPK: " + holzProKlick + " | HPS: " + holzProSekunde + "<br>" +
+                "Prestige: " + prestigePunkte + "<br><br>" +
+                "<b>Hinweis:</b> Admins werden nicht in der Rangliste gewertet.";
+        }
+
+
+        async function bugReportsLaden() {
+            if (!istAdmin) {
+                meldungAnzeigen("👑 Kein Admin-Zugriff.");
+                return;
+            }
+
+            bugListeBox.innerHTML = "Lade Bug-Meldungen...";
+
+            try {
+                const q = query(collection(db, "bugReports"), orderBy("erstelltAm", "desc"), limit(20));
+                const snapshot = await getDocs(q);
+
+                if (snapshot.empty) {
+                    bugListeBox.innerHTML = "Keine Bug-Meldungen vorhanden.";
+                    return;
+                }
+
+                let html = "";
+                snapshot.forEach(function (dokument) {
+                    const report = dokument.data();
+                    html +=
+                        "<div style='border-bottom:1px solid #ddd; padding:10px 0;'>" +
+                        "<b>" + sichererText(report.name || "Spieler") + "</b> " +
+                        "<span>⭐ " + (report.prestige || 0) + " | 🪵 " + (report.gesamtHolz || 0) + "</span><br>" +
+                        "<small>ID: " + sichererText(report.spielerId || "unbekannt") + "</small><br>" +
+                        sichererText(report.text || "") +
+                        "</div>";
+                });
+
+                bugListeBox.innerHTML = html;
+            } catch (error) {
+                bugListeBox.innerHTML = "Bug-Meldungen konnten nicht geladen werden.";
+                console.error(error);
+            }
+        }
+
+        function offlineFortschrittBerechnen() {
+            const jetzt = Date.now();
+
+            if (!letzterSpeicherZeitpunkt || letzterSpeicherZeitpunkt > jetzt) {
+                letzterSpeicherZeitpunkt = jetzt;
+                return;
+            }
+
+            const offlineSekunden = Math.min(
+                Math.floor((jetzt - letzterSpeicherZeitpunkt) / 1000),
+                OFFLINE_MAX_SEKUNDEN
+            );
+
+            if (offlineSekunden >= 10 && holzProSekunde > 0) {
+                const offlineHolz = Math.floor(offlineSekunden * berechneSekundenVerdienst());
+                holz += offlineHolz;
+                gesamtHolz += offlineHolz;
+
+                const minuten = Math.floor(offlineSekunden / 60);
+                const sekunden = offlineSekunden % 60;
+                meldungAnzeigen("🌙 Offline verdient: " + offlineHolz + " Holz (" + minuten + "m " + sekunden + "s)");
+            }
+
+            letzterSpeicherZeitpunkt = jetzt;
+        }
+
+        function achievementFreischalten(id, text) {
+            if (achievements[id]) return;
+
+            achievements[id] = true;
+            meldungAnzeigen("🏆 Erfolg freigeschaltet: " + text);
+        }
+
+        function achievementPruefen() {
+            if (gesamtKlicksAllzeit >= 100) achievementFreischalten("klicks100", "100 Klicks");
+            if (gesamtKlicksAllzeit >= 1000) achievementFreischalten("klicks1000", "1.000 Klicks");
+            if (gesamtHolz >= 10000) achievementFreischalten("holz10000", "10.000 Gesamt-Holz");
+            if (prestigePunkte >= 1 || prestigeDurchgefuehrt >= 1) achievementFreischalten("prestige1", "Erstes Prestige");
+            if (luckyBlocksGekauft >= 1) achievementFreischalten("lucky1", "Erster Lucky Block");
+            if (luckySpezialwetterAnzahl >= 1) achievementFreischalten("regenbogen1", "Goldener Regenbogen");
+            if (weltenbaumSamen) achievementFreischalten("weltenbaum1", "Weltenbaum-Samen gefunden");
+        }
+
+        function achievementListeAktualisieren() {
+            const liste = [
+                ["klicks100", "100 Klicks"],
+                ["klicks1000", "1.000 Klicks"],
+                ["holz10000", "10.000 Gesamt-Holz"],
+                ["prestige1", "Erstes Prestige"],
+                ["lucky1", "Erster Lucky Block"],
+                ["regenbogen1", "Goldener Regenbogen erlebt"],
+                ["weltenbaum1", "Weltenbaum-Samen gefunden"]
+            ];
+
+            let html = "";
+            liste.forEach(function (eintrag) {
+                const fertig = achievements[eintrag[0]] === true;
+                html += "<div class='achievementZeile " + (fertig ? "achievementFertig" : "achievementOffen") + "'>" +
+                    (fertig ? "✅ " : "⬜ ") + sichererText(eintrag[1]) +
+                    "</div>";
+            });
+
+            achievementBox.innerHTML = html;
+        }
+
+        function adminZahlAusInput(wert) {
+            const zahl = Math.floor(Number(wert));
+
+            if (!Number.isFinite(zahl) || zahl < 0) {
+                meldungAnzeigen("👑 Bitte eine gültige Zahl eingeben.");
+                return null;
+            }
+
+            return zahl;
+        }
+
+        function adminWertSetzen(name, wert) {
+            if (!istAdmin) return;
+
+            const zahl = adminZahlAusInput(wert);
+            if (zahl === null) return;
+
+            if (name === "holz") holz = zahl;
+            if (name === "klicks") klicks = zahl;
+            if (name === "gesamtHolz") gesamtHolz = zahl;
+            if (name === "holzProKlick") holzProKlick = Math.max(1, zahl);
+            if (name === "holzProSekunde") holzProSekunde = Math.max(weltenbaumSamen ? 20 : 0, zahl);
+            if (name === "prestigePunkte") prestigePunkte = zahl;
+            if (name === "verwarnungen") verwarnungen = Math.min(2, zahl);
+
+            speichern();
+            aktualisieren();
+            adminInfoAktualisieren();
+            meldungAnzeigen("👑 Admin: Wert gesetzt.");
+        }
+
+        function adminWertAddieren(name, wert) {
+            if (!istAdmin) return;
+
+            const zahl = adminZahlAusInput(wert);
+            if (zahl === null) return;
+
+            if (name === "holz") {
+                holz += zahl;
+                gesamtHolz += zahl;
+            }
+
+            if (name === "klicks") {
+                klicks += zahl;
+                gesamtKlicksAllzeit += zahl;
+            }
+
+            speichern();
+            aktualisieren();
+            adminInfoAktualisieren();
+            meldungAnzeigen("👑 Admin: Wert hinzugefügt.");
+        }
+
+
+        function loginFensterAnzeigen() {
+            loginFenster.style.display = "block";
+            overlay.style.display = "block";
+            overlay.classList.add("pflichtOverlay");
+            document.body.classList.add("fensterOffen");
+        }
+
+        async function registrierenMitEmail() {
+            const email = loginEmailInput.value.trim();
+            const passwort = loginPasswortInput.value.trim();
+            if (!email || passwort.length < 6) { meldungAnzeigen("☁️ Bitte E-Mail und mindestens 6 Zeichen Passwort eingeben."); return; }
+            try { await createUserWithEmailAndPassword(auth, email, passwort); meldungAnzeigen("☁️ Account erstellt!"); }
+            catch (error) { meldungAnzeigen("☁️ Registrierung fehlgeschlagen: " + fehlerKurz(error)); console.error(error); }
+        }
+
+        async function anmeldenMitEmail() {
+            const email = loginEmailInput.value.trim();
+            const passwort = loginPasswortInput.value.trim();
+            if (!email || !passwort) { meldungAnzeigen("☁️ Bitte E-Mail und Passwort eingeben."); return; }
+            try { await signInWithEmailAndPassword(auth, email, passwort); meldungAnzeigen("☁️ Angemeldet!"); }
+            catch (error) { meldungAnzeigen("☁️ Anmeldung fehlgeschlagen: " + fehlerKurz(error)); console.error(error); }
+        }
+
+        async function accountWechseln() {
+            if (firebaseBereit) await cloudSpeichern(true);
+            await signOut(auth);
+            loginPasswortInput.value = "";
+            alleFensterSchliessen();
+            loginFensterAnzeigen();
+            meldungAnzeigen("🚪 Abgemeldet. Du kannst den Account wechseln.");
+        }
+
+        function fehlerKurz(error) {
+            const code = String(error && error.code ? error.code : "Fehler");
+            return code.replace("auth/", "");
+        }
+
+        function einstellungenAktualisieren() {
+            accountInfoBox.innerHTML = "<b>Angemeldet als:</b><br>" + sichererText(nutzerEmail || "unbekannt") + "<br><br>" +
+                "<b>UID:</b><br>" + sichererText(spielerId || "nicht verbunden") + "<br><br>" +
+                "<b>Cloud:</b> " + (cloudGeladen ? "geladen" : "noch nicht geladen");
+        }
+
+        async function cloudSpeichern(sofort) {
+            if (!firebaseBereit || !spielerId) return;
+            const jetzt = Date.now();
+            if (!sofort && jetzt - letzterCloudUpload < 15000) return;
+            letzterCloudUpload = jetzt;
+            try {
+                speichern();
+                const gespeicherterStand = JSON.parse(localStorage.getItem(SAVE_KEY) || "{}");
+                await setDoc(doc(db, "cloudSaves", spielerId), {
+                    uid: spielerId, email: nutzerEmail, name: spielerName, spielstand: gespeicherterStand, aktualisiertAm: serverTimestamp()
+                }, { merge: true });
+                onlineAnzeige.textContent = istAdmin ? "☁️ Cloud gespeichert | 👑 Admin" : "☁️ Cloud gespeichert";
+            } catch (error) { onlineAnzeige.textContent = "☁️ Cloud-Speichern fehlgeschlagen"; console.error(error); }
+        }
+
+        async function cloudLadenBeimStart() {
+            try {
+                const saveDoc = await getDoc(doc(db, "cloudSaves", spielerId));
+                if (!saveDoc.exists()) { cloudGeladen = false; return; }
+                const daten = saveDoc.data();
+                if (daten.spielstand) {
+                    localStorage.setItem(SAVE_KEY, JSON.stringify(daten.spielstand));
+                    laden(); cloudGeladen = true; aktualisieren(); meldungAnzeigen("☁️ Cloud-Spielstand geladen.");
+                }
+            } catch (error) { console.error("Cloud-Laden fehlgeschlagen:", error); }
+        }
+
+        async function cloudLaden() {
+            if (!firebaseBereit || !spielerId) return;
+            try {
+                const saveDoc = await getDoc(doc(db, "cloudSaves", spielerId));
+                if (!saveDoc.exists()) { meldungAnzeigen("☁️ Kein Cloud-Spielstand gefunden."); return; }
+                const daten = saveDoc.data();
+                if (daten.spielstand) {
+                    localStorage.setItem(SAVE_KEY, JSON.stringify(daten.spielstand));
+                    laden(); cloudGeladen = true; aktualisieren(); einstellungenAktualisieren(); meldungAnzeigen("☁️ Cloud-Spielstand geladen.");
+                }
+            } catch (error) { meldungAnzeigen("☁️ Cloud-Laden fehlgeschlagen."); console.error(error); }
+        }
+
+        function haustiereAktualisieren() {
+            const pets = [
+                { id: "eichhorn", name: "🐿️ Eichhörnchen", kosten: 5000, text: "+5% Holz pro Klick" },
+                { id: "fuchs", name: "🦊 Fuchs", kosten: 10000, text: "+10% Holz pro Sekunde" },
+                { id: "wolf", name: "🐺 Wolf", kosten: 20000, text: "+15% Klick-Holz" }
+            ];
+            let html = "";
+            pets.forEach(function (pet) {
+                const aktiv = aktiveHaustiere[pet.id] === true;
+                html += "<div class='kartenBox'><b>" + pet.name + "</b><br>" + pet.text + "<br>" +
+                    (aktiv ? "<span class='aktivMarkierung'>Bereits aktiv</span>" :
+                    "<button onclick='window.baumclickerPetKaufen(\"" + pet.id + "\")'>Kaufen (" + pet.kosten + " Holz)</button>") + "</div>";
+            });
+            haustierBox.innerHTML = html;
+        }
+
+        window.baumclickerPetKaufen = function (id) {
+            const kosten = { eichhorn: 5000, fuchs: 10000, wolf: 20000 }[id] || 999999;
+            if (holz < kosten) { fehlkauf(); return; }
+            holz -= kosten; aktiveHaustiere[id] = true; speichern(); cloudSpeichern(true); aktualisieren(); haustiereAktualisieren(); meldungAnzeigen("🐾 Haustier gekauft!");
+        };
+
+        function berechneHaustierKlickBonus() {
+            let bonus = 1; if (aktiveHaustiere.eichhorn) bonus += 0.05; if (aktiveHaustiere.wolf) bonus += 0.15; return bonus;
+        }
+
+        function berechneHaustierSekundenBonus() {
+            let bonus = 1; if (aktiveHaustiere.fuchs) bonus += 0.10; return bonus;
+        }
+
+        function skinsAktualisieren() {
+            const skins = [
+                { id: "standard", name: "🌱 Standard", kosten: 0 },
+                { id: "winter", name: "🎄 Winterbaum", kosten: 3000 },
+                { id: "gold", name: "🌟 Goldbaum", kosten: 10000 },
+                { id: "sakura", name: "🌸 Sakura", kosten: 15000 },
+                { id: "weltenbaum", name: "💎 Weltenbaum", kosten: 25000 }
+            ];
+            let html = "";
+            skins.forEach(function (skin) {
+                const gekauft = gekaufteSkins[skin.id] === true;
+                const aktiv = aktiverSkin === skin.id;
+                html += "<div class='kartenBox'><b>" + skin.name + "</b><br>" +
+                    (aktiv ? "<span class='aktivMarkierung'>Aktiv</span>" : gekauft ?
+                    "<button onclick='window.baumclickerSkinWaehlen(\"" + skin.id + "\")'>Aktivieren</button>" :
+                    "<button onclick='window.baumclickerSkinKaufen(\"" + skin.id + "\")'>Kaufen (" + skin.kosten + " Holz)</button>") + "</div>";
+            });
+            skinBox.innerHTML = html;
+        }
+
+        window.baumclickerSkinKaufen = function (id) {
+            const kosten = { standard: 0, winter: 3000, gold: 10000, sakura: 15000, weltenbaum: 25000 }[id] || 999999;
+            if (holz < kosten) { fehlkauf(); return; }
+            holz -= kosten; gekaufteSkins[id] = true; aktiverSkin = id; speichern(); cloudSpeichern(true); aktualisieren(); skinsAktualisieren(); meldungAnzeigen("🎨 Skin gekauft und aktiviert!");
+        };
+
+        window.baumclickerSkinWaehlen = function (id) {
+            if (!gekaufteSkins[id]) return; aktiverSkin = id; speichern(); cloudSpeichern(true); aktualisieren(); skinsAktualisieren(); meldungAnzeigen("🎨 Skin aktiviert!");
+        };
+
+        async function freundAnfrageSenden() {
+            if (!firebaseBereit || !spielerId) return;
+            const anUid = freundUidInput.value.trim();
+            if (!anUid || anUid === spielerId) { meldungAnzeigen("👥 Bitte gültige Freund-UID eingeben."); return; }
+            try {
+                await addDoc(collection(db, "friendRequests"), { vonUid: spielerId, anUid: anUid, vonName: spielerName, status: "offen", erstelltAm: serverTimestamp() });
+                freundUidInput.value = ""; meldungAnzeigen("👥 Anfrage gesendet.");
+            } catch (error) { meldungAnzeigen("👥 Anfrage konnte nicht gesendet werden."); console.error(error); }
+        }
+
+        async function freundeLaden() {
+            if (!firebaseBereit || !spielerId) return;
+            freundeBox.innerHTML = "Beta-Freundesliste aktiv.<br><br>Deine UID zum Teilen:<br><b>" + sichererText(spielerId) + "</b><br><br>Hinweis: Anfragen werden in dieser Beta gesendet. Annehmen/Verwalten bauen wir im nächsten Bugfix sauber aus.";
+        }
+
+        async function tradeSenden() {
+            if (!firebaseBereit || !spielerId) return;
+            const anUid = tradeUidInput.value.trim();
+            const menge = Math.floor(Number(tradeHolzInput.value));
+            if (!anUid || anUid === spielerId || !Number.isFinite(menge) || menge <= 0) { meldungAnzeigen("🔄 Bitte gültige UID und Holzmenge eingeben."); return; }
+            if (holz < menge) { fehlkauf(); return; }
+            try {
+                holz -= menge;
+                await addDoc(collection(db, "trades"), { vonUid: spielerId, anUid: anUid, vonName: spielerName, typ: "holzGeschenk", holz: menge, status: "offen", erstelltAm: serverTimestamp() });
+                speichern(); cloudSpeichern(true); aktualisieren(); tradeUidInput.value = ""; tradeHolzInput.value = ""; meldungAnzeigen("🔄 Geschenk gesendet.");
+            } catch (error) { holz += menge; meldungAnzeigen("🔄 Geschenk konnte nicht gesendet werden."); console.error(error); }
+        }
+
+        async function tradesLaden() {
+            if (!firebaseBereit || !spielerId) return;
+            tradeBox.innerHTML = "Trading Beta aktiv.<br><br>Aktuell kannst du Holz-Geschenke senden.<br>Annehmen/Einlösen wird im nächsten Schritt eingebaut.";
+        }
+
+        async function versionPruefen() {
+            if (!firebaseBereit) return;
+
+            try {
+                const versionDoc = await getDoc(doc(db, "spielInfo", "version"));
+
+                if (!versionDoc.exists()) {
+                    return;
+                }
+
+                const daten = versionDoc.data();
+                const aktuelleVersion = String(daten.aktuelleVersion || "");
+                const nachricht = String(daten.nachricht || "Bitte lade die Seite neu, damit du die neueste Version spielst.");
+
+                if (aktuelleVersion && aktuelleVersion !== SPIEL_VERSION) {
+                    updateText.textContent = nachricht + " Aktuell im Spiel: " + SPIEL_VERSION + " | Neu: " + aktuelleVersion;
+                    updateFenster.style.display = "block";
+                    overlay.style.display = "block";
+                    document.body.classList.add("fensterOffen");
+                }
+            } catch (error) {
+                console.error("Versionscheck fehlgeschlagen:", error);
+            }
+        }
+
+        async function firebaseStarten() {
+            try {
+                onAuthStateChanged(auth, async function (user) {
+                    if (user) {
+                        spielerId = user.uid;
+                        nutzerEmail = user.email || "";
+                        firebaseBereit = true;
+                        istAdmin = ADMIN_IDS.includes(spielerId);
+
+                        loginFenster.style.display = "none";
+                        overlay.classList.remove("pflichtOverlay");
+                        document.body.classList.remove("fensterOffen");
+
+                        if (istAdmin) {
+                            adminButton.style.display = "inline-block";
+                            onlineAnzeige.textContent = "☁️ Online: verbunden | 👑 Admin";
+                        } else {
+                            adminButton.style.display = "none";
+                            onlineAnzeige.textContent = "☁️ Online: verbunden";
+                        }
+
+                        await cloudLadenBeimStart();
+                        onlineSpeichern(true);
+                        cloudSpeichern(true);
+                        versionPruefen();
+                        pruefeNamensPflicht();
+                    } else {
+                        firebaseBereit = false;
+                        spielerId = null;
+                        nutzerEmail = "";
+                        istAdmin = false;
+                        adminButton.style.display = "none";
+                        onlineAnzeige.textContent = "☁️ Nicht angemeldet";
+                        loginFensterAnzeigen();
+                    }
+                });
+            } catch (error) {
+                onlineAnzeige.textContent = "☁️ Online: Fehler";
+                console.error(error);
+            }
+        }
+
+        async function onlineSpeichern        async function onlineSpeichern(sofort) {
+            if (!firebaseBereit || !spielerId) return;
+
+            if (istAdmin) {
+                onlineAnzeige.textContent = "☁️ Online: Admin wird nicht gewertet";
+                return;
+            }
+
+            const jetzt = Date.now();
+            if (!sofort && jetzt - letzterOnlineUpload < 15000) return;
+            letzterOnlineUpload = jetzt;
+
+            try {
+                await setDoc(doc(db, "spieler", spielerId), {
+                    name: spielerName,
+                    klicks: gesamtKlicksAllzeit,
+                    gesamtHolz: gesamtHolz,
+                    prestige: prestigePunkte,
+                    aktualisiertAm: serverTimestamp()
+                });
+
+                onlineAnzeige.textContent = "☁️ Online: gespeichert";
+            } catch (error) {
+                onlineAnzeige.textContent = "☁️ Online: Speichern fehlgeschlagen";
+                console.error(error);
+            }
+        }
+
+        async function onlineZuruecksetzen() {
+            if (!firebaseBereit || !spielerId) return;
+
+            try {
+                await setDoc(doc(db, "spieler", spielerId), {
+                    name: spielerName,
+                    klicks: 0,
+                    gesamtHolz: 0,
+                    prestige: 0,
+                    aktualisiertAm: serverTimestamp()
+                });
+
+                onlineAnzeige.textContent = "☁️ Online: zurückgesetzt";
+            } catch (error) {
+                onlineAnzeige.textContent = "☁️ Online-Reset fehlgeschlagen";
+                console.error(error);
+            }
+        }
+
+        async function ranglisteLaden() {
+            ranglisteBox.innerHTML = "Lade Rangliste...";
+
+            try {
+                const q = query(collection(db, "spieler"), orderBy("prestige", "desc"), limit(10));
+                const snapshot = await getDocs(q);
+                const eintraege = [];
+
+                snapshot.forEach(function (dokument) {
+                    eintraege.push(dokument.data());
+                });
+
+                eintraege.sort(function (a, b) {
+                    if ((b.prestige || 0) !== (a.prestige || 0)) {
+                        return (b.prestige || 0) - (a.prestige || 0);
+                    }
+                    return (b.gesamtHolz || 0) - (a.gesamtHolz || 0);
+                });
+
+                if (eintraege.length === 0) {
+                    ranglisteBox.innerHTML = "Noch keine Einträge vorhanden.";
+                    return;
+                }
+
+                let html = "";
+                eintraege.forEach(function (eintrag, index) {
+                    html +=
+                        "<div class='ranglistenZeile'>" +
+                        "<span>" + (index + 1) + ". " + sichererText(eintrag.name || "Spieler") + "</span>" +
+                        "<span>⭐ " + (eintrag.prestige || 0) + " | 🪵 " + (eintrag.gesamtHolz || 0) + "</span>" +
+                        "</div>";
+                });
+
+                ranglisteBox.innerHTML = html;
+            } catch (error) {
+                ranglisteBox.innerHTML = "Rangliste konnte nicht geladen werden.";
+                console.error(error);
+            }
+        }
+
+        function sichererText(text) {
+            return String(text)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+    </script>
+
+</body>
+</html>
