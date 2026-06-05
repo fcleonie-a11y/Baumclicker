@@ -897,8 +897,7 @@
         const SPIEL_VERSION = "2.0";
         const OFFLINE_MAX_SEKUNDEN = 60 * 60 * 8;
         const ADMIN_IDS = [
-            "knI7Tx88gxgPu95vi2eqhMMANyF2",
-            "1L6nIvqao2fu313PTerqEZEfNbJ3"
+            "I4tKxmYCr9NQC3WtUwJ5dU4SXn02"
         ];
 
         let klicks = 0;
@@ -2619,6 +2618,7 @@
                 }, { merge: true });
 
                 onlineAnzeige.textContent = istAdmin ? "☁️ Cloud gespeichert | 👑 Admin" : "☁️ Cloud gespeichert";
+                cloudGeladen = true;
             } catch (error) {
                 onlineAnzeige.textContent = "☁️ Cloud-Speichern fehlgeschlagen";
                 console.error(error);
@@ -2626,24 +2626,45 @@
         }
 
         async function cloudLadenBeimStart() {
+            if (!firebaseBereit || !spielerId) return;
+
             try {
                 const saveDoc = await getDoc(doc(db, "cloudSaves", spielerId));
 
                 if (!saveDoc.exists()) {
                     cloudGeladen = false;
+                    await cloudSpeichern(true);
                     return;
                 }
 
                 const daten = saveDoc.data();
-                if (daten.spielstand) {
-                    localStorage.setItem(SAVE_KEY, JSON.stringify(daten.spielstand));
-                    laden();
-                    cloudGeladen = true;
-                    aktualisieren();
-                    meldungAnzeigen("☁️ Cloud-Spielstand geladen.");
+                const cloudStand = daten.spielstand || null;
+
+                if (!cloudStand) {
+                    cloudGeladen = false;
+                    await cloudSpeichern(true);
+                    return;
                 }
+
+                const lokalerStand = JSON.parse(localStorage.getItem(SAVE_KEY) || "{}");
+                const lokalZeit = Number(lokalerStand.letzterSpeicherZeitpunkt || 0);
+                const cloudZeit = Number(cloudStand.letzterSpeicherZeitpunkt || 0);
+
+                if (lokalZeit > cloudZeit) {
+                    cloudGeladen = true;
+                    await cloudSpeichern(true);
+                    meldungAnzeigen("☁️ Lokaler neuerer Spielstand wurde in die Cloud übernommen.");
+                    return;
+                }
+
+                localStorage.setItem(SAVE_KEY, JSON.stringify(cloudStand));
+                laden();
+                cloudGeladen = true;
+                aktualisieren();
+                meldungAnzeigen("☁️ Cloud-Spielstand geladen.");
             } catch (error) {
                 console.error("Cloud-Laden fehlgeschlagen:", error);
+                meldungAnzeigen("☁️ Cloud konnte nicht geladen werden. Lokaler Spielstand bleibt aktiv.");
             }
         }
 
