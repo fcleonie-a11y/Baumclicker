@@ -2122,8 +2122,10 @@
                 luckyWeltenbaumAnzahl = spielstand.luckyWeltenbaumAnzahl || 0;
                 luckyPrestigeAnzahl = spielstand.luckyPrestigeAnzahl || 0;
                 luckyPechAnzahl = spielstand.luckyPechAnzahl || 0;
-                achievements,
-                aktiveHaustiere, aktiverSkin, gekaufteSkins = spielstand.achievements || {};
+                achievements = spielstand.achievements || {};
+                aktiveHaustiere = spielstand.aktiveHaustiere || {};
+                aktiverSkin = spielstand.aktiverSkin || "standard";
+                gekaufteSkins = spielstand.gekaufteSkins || { standard: true };
             }
         }
 
@@ -2918,7 +2920,7 @@
             }
         }
 
-        async function onlineSpeichern        async function onlineSpeichern(sofort) {
+        async function onlineSpeichern(sofort) {
             if (!firebaseBereit || !spielerId) return;
 
             if (istAdmin) {
