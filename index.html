@@ -534,6 +534,7 @@
         <div id="statusZeile">
             <div id="prestigeAnzeige" class="statusChip">⭐ Prestige: 0 | Bonus: 0%</div>
             <div id="wetterAnzeige" class="statusChip">🌦️ Wetter in: 05:00</div>
+            <div id="effektAnzeige" class="statusChip">✨ Effekte: Keine</div>
             <div id="onlineAnzeige" class="statusChip">☁️ Online: wird verbunden...</div>
         </div>
 
@@ -972,6 +973,7 @@
         let aktiveHaustiere = {};
         let aktiverSkin = "standard";
         let gekaufteSkins = { standard: true };
+        let effektEndeZeiten = {};
 
         const klickAnzeige = document.getElementById("klickAnzeige");
         const holzAnzeige = document.getElementById("holzAnzeige");
@@ -981,6 +983,7 @@
         const holzProSekundeAnzeige = document.getElementById("holzProSekundeAnzeige");
         const prestigeAnzeige = document.getElementById("prestigeAnzeige");
         const wetterAnzeige = document.getElementById("wetterAnzeige");
+        const effektAnzeige = document.getElementById("effektAnzeige");
         const verwarnungAnzeige = document.getElementById("verwarnungAnzeige");
         const onlineAnzeige = document.getElementById("onlineAnzeige");
         const baumAnzeige = document.getElementById("baum");
@@ -1132,6 +1135,19 @@
         firebaseStarten();
         loginFensterAnzeigen();
         setInterval(versionPruefen, 60000);
+
+
+        window.addEventListener("pagehide", function () {
+            speichern();
+            cloudSpeichern(true);
+        });
+
+        document.addEventListener("visibilitychange", function () {
+            if (document.visibilityState === "hidden") {
+                speichern();
+                cloudSpeichern(true);
+            }
+        });
 
         updateJetztButton.addEventListener("click", function () {
             location.reload();
@@ -1504,6 +1520,7 @@
             }
 
             wetterOptikAktualisieren();
+            effektAnzeigeAktualisieren();
             speichern();
             onlineSpeichern(false);
             cloudSpeichern(false);
@@ -1628,6 +1645,43 @@
             }
         }
 
+
+        function effektStarten(id, name, dauerSekunden) {
+            effektEndeZeiten[id] = {
+                name: name,
+                ende: Date.now() + dauerSekunden * 1000
+            };
+            effektAnzeigeAktualisieren();
+        }
+
+        function effektBeenden(id) {
+            delete effektEndeZeiten[id];
+            effektAnzeigeAktualisieren();
+        }
+
+        function effektAnzeigeAktualisieren() {
+            const jetzt = Date.now();
+            const aktiveTexte = [];
+
+            Object.keys(effektEndeZeiten).forEach(function (id) {
+                const effekt = effektEndeZeiten[id];
+
+                if (!effekt || effekt.ende <= jetzt) {
+                    delete effektEndeZeiten[id];
+                    return;
+                }
+
+                const restSekunden = Math.ceil((effekt.ende - jetzt) / 1000);
+                aktiveTexte.push(effekt.name + " " + formatiereZeit(restSekunden));
+            });
+
+            if (aktiveTexte.length === 0) {
+                effektAnzeige.textContent = "✨ Effekte: Keine";
+            } else {
+                effektAnzeige.textContent = "✨ Effekte: " + aktiveTexte.join(" | ");
+            }
+        }
+
         function wetterOptikAktualisieren() {
             if (aktivesWetter.includes("Regen")) {
                 if (Math.random() < 0.45) {
@@ -1732,11 +1786,13 @@
             luckyBonusKlick = 1.15;
             luckyBonusSekunde = 1.15;
             meldungAnzeigen("🚀 Lucky Booster! 60 Sekunden +15% auf Holz!");
+            effektStarten("luckyBooster", "🚀 Booster", 60);
 
             setTimeout(function () {
                 luckyBoosterAktiv = false;
                 luckyBonusKlick = 1;
                 luckyBonusSekunde = 1;
+                effektBeenden("luckyBooster");
                 speichern();
                 aktualisieren();
             }, 60000);
@@ -1749,12 +1805,14 @@
             wetterBonusKlick = 2;
             wetterBonusSekunde = 2;
             meldungAnzeigen("🌈 GOLDENER REGENBOGEN! 60 Sekunden doppelter Ertrag!");
+            effektStarten("regenbogen", "🌈 Regenbogen", 60);
 
             setTimeout(function () {
                 wetterBonusKlick = 1;
                 wetterBonusSekunde = 1;
                 aktivesWetter = "Kein Wetter";
                 wetterIcon.textContent = "🌤️";
+                effektBeenden("regenbogen");
                 speichern();
                 aktualisieren();
             }, 60000);
@@ -1804,11 +1862,13 @@
                     wetterIcon.textContent = "☀️";
                     wetterBonusKlick = 1.2;
                     meldungAnzeigen("☀️ Sonne! 60 Sekunden +20% Holz pro Klick!");
+                    effektStarten("wetter", "☀️ Sonne", 60);
 
                     setTimeout(function () {
                         wetterBonusKlick = 1;
                         aktivesWetter = "Kein Wetter";
                         wetterIcon.textContent = "🌤️";
+                        effektBeenden("wetter");
                         speichern();
                         aktualisieren();
                     }, 60000);
@@ -1820,11 +1880,13 @@
                     wetterIcon.textContent = "🌧️";
                     wetterBonusSekunde = 1.5;
                     meldungAnzeigen("🌧️ Regen! 60 Sekunden +50% Holz pro Sekunde!");
+                    effektStarten("wetter", "🌧️ Regen", 60);
 
                     setTimeout(function () {
                         wetterBonusSekunde = 1;
                         aktivesWetter = "Kein Wetter";
                         wetterIcon.textContent = "🌤️";
+                        effektBeenden("wetter");
                         speichern();
                         aktualisieren();
                     }, 60000);
@@ -1835,10 +1897,12 @@
                     aktivesWetter = "⛈️ Sturm: +1 Verwarnung";
                     wetterIcon.textContent = "⛈️";
                     verwarnungGeben("⛈️ Sturm! Du bekommst eine Verwarnung!");
+                    effektStarten("wetter", "⛈️ Sturm", 60);
 
                     setTimeout(function () {
                         aktivesWetter = "Kein Wetter";
                         wetterIcon.textContent = "🌤️";
+                        effektBeenden("wetter");
                         speichern();
                         aktualisieren();
                     }, 60000);
@@ -1852,10 +1916,12 @@
                     holz += bonusHolz;
                     gesamtHolz += bonusHolz;
                     meldungAnzeigen("🍃 Wind! +" + bonusHolz + " Holz!");
+                    effektStarten("wetter", "🍃 Wind", 60);
 
                     setTimeout(function () {
                         aktivesWetter = "Kein Wetter";
                         wetterIcon.textContent = "🌤️";
+                        effektBeenden("wetter");
                         speichern();
                         aktualisieren();
                     }, 60000);
@@ -1864,6 +1930,7 @@
                 keinWetterAnzahl++;
                 aktivesWetter = "Kein Wetter";
                 wetterIcon.textContent = "🌤️";
+                effektBeenden("wetter");
                 meldungAnzeigen("🌦️ Kein Wetter passiert.");
             }
 
@@ -2266,6 +2333,7 @@
                 "⭐ Prestige-Bonus: +1 Prestige-Punkt — bisher " + luckyPrestigeAnzahl + "x<br>" +
                 "⚠️ Pech: +1 Verwarnung — bisher " + luckyPechAnzahl + "x";
 
+            effektAnzeigeAktualisieren();
             achievementPruefen();
         }
 
