@@ -675,6 +675,17 @@
         <div id="aenderungenBox">
             <h3>Beta 2.0</h3>
             <ul>
+                <li>🔐 E-Mail/Passwort-Login eingebaut.</li>
+                <li>☁️ Cloud-Speicher eingebaut.</li>
+                <li>⚙️ Einstellungen mit Account-Wechsel eingebaut.</li>
+                <li>🐾 Haustiere eingebaut.</li>
+                <li>🎨 Skins eingebaut.</li>
+                <li>👥 Freundesliste Beta vorbereitet.</li>
+                <li>🔄 Trading Beta vorbereitet.</li>
+            </ul>
+
+            <h3>Beta 1.6.3</h3>
+            <ul>
                 <li>📋 Neue Menü-Struktur eingebaut.</li>
                 <li>🏆 Rangliste, Effekte, Fehler melden, Erfolge und Änderungen liegen jetzt im Menü.</li>
                 <li>🔄 Der alte Aktualisieren-Button wurde entfernt.</li>
@@ -713,7 +724,7 @@
             <input id="loginPasswortInput" type="password" placeholder="Passwort">
             <button id="loginButton">🔐 Anmelden</button>
             <button id="registerButton">📝 Registrieren</button>
-            <div class="hinweis">Für Beta 2.0 brauchst du ein Konto. Dein Spielstand wird dann in der Cloud gespeichert.</div>
+            <div class="hinweis">Für Beta 2.0 brauchst du ein Konto. Dein Spielstand wird in der Cloud gespeichert.</div>
         </div>
     </div>
 
@@ -1006,7 +1017,6 @@
         const aenderungenButton = document.getElementById("aenderungenButton");
         const aenderungenFenster = document.getElementById("aenderungenFenster");
         const aenderungenSchliessenButton = document.getElementById("aenderungenSchliessenButton");
-
         const loginFenster = document.getElementById("loginFenster");
         const loginEmailInput = document.getElementById("loginEmailInput");
         const loginPasswortInput = document.getElementById("loginPasswortInput");
@@ -1047,6 +1057,7 @@
         const tradeSendenButton = document.getElementById("tradeSendenButton");
         const tradeBox = document.getElementById("tradeBox");
         const tradesLadenButton = document.getElementById("tradesLadenButton");
+
 
         const prestigeButton = document.getElementById("prestigeButton");
         const holzfaellerButton = document.getElementById("holzfaellerButton");
@@ -1136,6 +1147,7 @@
         cloudSpeichernButton.addEventListener("click", function () { cloudSpeichern(true); });
         cloudLadenButton.addEventListener("click", cloudLaden);
         accountWechselButton.addEventListener("click", accountWechseln);
+
 
         baumButton.addEventListener("click", function (event) {
             baumKlicken(event);
@@ -1316,6 +1328,7 @@
         tradingSchliessenButton.addEventListener("click", alleFensterSchliessen);
         tradeSendenButton.addEventListener("click", tradeSenden);
         tradesLadenButton.addEventListener("click", tradesLaden);
+
 
         achievementButton.addEventListener("click", function () {
             hauptMenueSchliessen();
@@ -2145,7 +2158,12 @@
             }
 
             if (aktiverSkin !== "standard") {
-                const skinEmoji = { winter: "🎄", gold: "🌟", sakura: "🌸", weltenbaum: "💎🌳" };
+                const skinEmoji = {
+                    winter: "🎄",
+                    gold: "🌟",
+                    sakura: "🌸",
+                    weltenbaum: "💎🌳"
+                };
                 baumAnzeige.textContent = skinEmoji[aktiverSkin] || baumAnzeige.textContent;
             }
 
@@ -2522,21 +2540,44 @@
         async function registrierenMitEmail() {
             const email = loginEmailInput.value.trim();
             const passwort = loginPasswortInput.value.trim();
-            if (!email || passwort.length < 6) { meldungAnzeigen("☁️ Bitte E-Mail und mindestens 6 Zeichen Passwort eingeben."); return; }
-            try { await createUserWithEmailAndPassword(auth, email, passwort); meldungAnzeigen("☁️ Account erstellt!"); }
-            catch (error) { meldungAnzeigen("☁️ Registrierung fehlgeschlagen: " + fehlerKurz(error)); console.error(error); }
+
+            if (!email || passwort.length < 6) {
+                meldungAnzeigen("☁️ Bitte E-Mail und mindestens 6 Zeichen Passwort eingeben.");
+                return;
+            }
+
+            try {
+                await createUserWithEmailAndPassword(auth, email, passwort);
+                meldungAnzeigen("☁️ Account erstellt!");
+            } catch (error) {
+                meldungAnzeigen("☁️ Registrierung fehlgeschlagen: " + fehlerKurz(error));
+                console.error(error);
+            }
         }
 
         async function anmeldenMitEmail() {
             const email = loginEmailInput.value.trim();
             const passwort = loginPasswortInput.value.trim();
-            if (!email || !passwort) { meldungAnzeigen("☁️ Bitte E-Mail und Passwort eingeben."); return; }
-            try { await signInWithEmailAndPassword(auth, email, passwort); meldungAnzeigen("☁️ Angemeldet!"); }
-            catch (error) { meldungAnzeigen("☁️ Anmeldung fehlgeschlagen: " + fehlerKurz(error)); console.error(error); }
+
+            if (!email || !passwort) {
+                meldungAnzeigen("☁️ Bitte E-Mail und Passwort eingeben.");
+                return;
+            }
+
+            try {
+                await signInWithEmailAndPassword(auth, email, passwort);
+                meldungAnzeigen("☁️ Angemeldet!");
+            } catch (error) {
+                meldungAnzeigen("☁️ Anmeldung fehlgeschlagen: " + fehlerKurz(error));
+                console.error(error);
+            }
         }
 
         async function accountWechseln() {
-            if (firebaseBereit) await cloudSpeichern(true);
+            if (firebaseBereit) {
+                await cloudSpeichern(true);
+            }
+
             await signOut(auth);
             loginPasswortInput.value = "";
             alleFensterSchliessen();
@@ -2550,49 +2591,84 @@
         }
 
         function einstellungenAktualisieren() {
-            accountInfoBox.innerHTML = "<b>Angemeldet als:</b><br>" + sichererText(nutzerEmail || "unbekannt") + "<br><br>" +
+            accountInfoBox.innerHTML =
+                "<b>Angemeldet als:</b><br>" + sichererText(nutzerEmail || "unbekannt") + "<br><br>" +
                 "<b>UID:</b><br>" + sichererText(spielerId || "nicht verbunden") + "<br><br>" +
                 "<b>Cloud:</b> " + (cloudGeladen ? "geladen" : "noch nicht geladen");
         }
 
         async function cloudSpeichern(sofort) {
             if (!firebaseBereit || !spielerId) return;
+
             const jetzt = Date.now();
             if (!sofort && jetzt - letzterCloudUpload < 15000) return;
             letzterCloudUpload = jetzt;
+
             try {
                 speichern();
                 const gespeicherterStand = JSON.parse(localStorage.getItem(SAVE_KEY) || "{}");
+
                 await setDoc(doc(db, "cloudSaves", spielerId), {
-                    uid: spielerId, email: nutzerEmail, name: spielerName, spielstand: gespeicherterStand, aktualisiertAm: serverTimestamp()
+                    uid: spielerId,
+                    email: nutzerEmail,
+                    name: spielerName,
+                    spielstand: gespeicherterStand,
+                    aktualisiertAm: serverTimestamp()
                 }, { merge: true });
+
                 onlineAnzeige.textContent = istAdmin ? "☁️ Cloud gespeichert | 👑 Admin" : "☁️ Cloud gespeichert";
-            } catch (error) { onlineAnzeige.textContent = "☁️ Cloud-Speichern fehlgeschlagen"; console.error(error); }
+            } catch (error) {
+                onlineAnzeige.textContent = "☁️ Cloud-Speichern fehlgeschlagen";
+                console.error(error);
+            }
         }
 
         async function cloudLadenBeimStart() {
             try {
                 const saveDoc = await getDoc(doc(db, "cloudSaves", spielerId));
-                if (!saveDoc.exists()) { cloudGeladen = false; return; }
+
+                if (!saveDoc.exists()) {
+                    cloudGeladen = false;
+                    return;
+                }
+
                 const daten = saveDoc.data();
                 if (daten.spielstand) {
                     localStorage.setItem(SAVE_KEY, JSON.stringify(daten.spielstand));
-                    laden(); cloudGeladen = true; aktualisieren(); meldungAnzeigen("☁️ Cloud-Spielstand geladen.");
+                    laden();
+                    cloudGeladen = true;
+                    aktualisieren();
+                    meldungAnzeigen("☁️ Cloud-Spielstand geladen.");
                 }
-            } catch (error) { console.error("Cloud-Laden fehlgeschlagen:", error); }
+            } catch (error) {
+                console.error("Cloud-Laden fehlgeschlagen:", error);
+            }
         }
 
         async function cloudLaden() {
             if (!firebaseBereit || !spielerId) return;
+
             try {
                 const saveDoc = await getDoc(doc(db, "cloudSaves", spielerId));
-                if (!saveDoc.exists()) { meldungAnzeigen("☁️ Kein Cloud-Spielstand gefunden."); return; }
+
+                if (!saveDoc.exists()) {
+                    meldungAnzeigen("☁️ Kein Cloud-Spielstand gefunden.");
+                    return;
+                }
+
                 const daten = saveDoc.data();
                 if (daten.spielstand) {
                     localStorage.setItem(SAVE_KEY, JSON.stringify(daten.spielstand));
-                    laden(); cloudGeladen = true; aktualisieren(); einstellungenAktualisieren(); meldungAnzeigen("☁️ Cloud-Spielstand geladen.");
+                    laden();
+                    cloudGeladen = true;
+                    aktualisieren();
+                    einstellungenAktualisieren();
+                    meldungAnzeigen("☁️ Cloud-Spielstand geladen.");
                 }
-            } catch (error) { meldungAnzeigen("☁️ Cloud-Laden fehlgeschlagen."); console.error(error); }
+            } catch (error) {
+                meldungAnzeigen("☁️ Cloud-Laden fehlgeschlagen.");
+                console.error(error);
+            }
         }
 
         function haustiereAktualisieren() {
@@ -2601,28 +2677,47 @@
                 { id: "fuchs", name: "🦊 Fuchs", kosten: 10000, text: "+10% Holz pro Sekunde" },
                 { id: "wolf", name: "🐺 Wolf", kosten: 20000, text: "+15% Klick-Holz" }
             ];
-            let html = "";
+
+            let petHtml = "";
             pets.forEach(function (pet) {
                 const aktiv = aktiveHaustiere[pet.id] === true;
-                html += "<div class='kartenBox'><b>" + pet.name + "</b><br>" + pet.text + "<br>" +
+                petHtml += "<div class='kartenBox'><b>" + pet.name + "</b><br>" + pet.text + "<br>" +
                     (aktiv ? "<span class='aktivMarkierung'>Bereits aktiv</span>" :
-                    "<button onclick='window.baumclickerPetKaufen(\"" + pet.id + "\")'>Kaufen (" + pet.kosten + " Holz)</button>") + "</div>";
+                    "<button onclick='window.baumclickerPetKaufen(\"" + pet.id + "\")'>Kaufen (" + pet.kosten + " Holz)</button>") +
+                    "</div>";
             });
-            haustierBox.innerHTML = html;
+
+            haustierBox.innerHTML = petHtml;
         }
 
         window.baumclickerPetKaufen = function (id) {
             const kosten = { eichhorn: 5000, fuchs: 10000, wolf: 20000 }[id] || 999999;
-            if (holz < kosten) { fehlkauf(); return; }
-            holz -= kosten; aktiveHaustiere[id] = true; speichern(); cloudSpeichern(true); aktualisieren(); haustiereAktualisieren(); meldungAnzeigen("🐾 Haustier gekauft!");
+
+            if (holz < kosten) {
+                fehlkauf();
+                return;
+            }
+
+            holz -= kosten;
+            aktiveHaustiere[id] = true;
+            speichern();
+            cloudSpeichern(true);
+            aktualisieren();
+            haustiereAktualisieren();
+            meldungAnzeigen("🐾 Haustier gekauft!");
         };
 
         function berechneHaustierKlickBonus() {
-            let bonus = 1; if (aktiveHaustiere.eichhorn) bonus += 0.05; if (aktiveHaustiere.wolf) bonus += 0.15; return bonus;
+            let bonus = 1;
+            if (aktiveHaustiere.eichhorn) bonus += 0.05;
+            if (aktiveHaustiere.wolf) bonus += 0.15;
+            return bonus;
         }
 
         function berechneHaustierSekundenBonus() {
-            let bonus = 1; if (aktiveHaustiere.fuchs) bonus += 0.10; return bonus;
+            let bonus = 1;
+            if (aktiveHaustiere.fuchs) bonus += 0.10;
+            return bonus;
         }
 
         function skinsAktualisieren() {
@@ -2633,58 +2728,126 @@
                 { id: "sakura", name: "🌸 Sakura", kosten: 15000 },
                 { id: "weltenbaum", name: "💎 Weltenbaum", kosten: 25000 }
             ];
-            let html = "";
+
+            let skinHtml = "";
             skins.forEach(function (skin) {
                 const gekauft = gekaufteSkins[skin.id] === true;
                 const aktiv = aktiverSkin === skin.id;
-                html += "<div class='kartenBox'><b>" + skin.name + "</b><br>" +
-                    (aktiv ? "<span class='aktivMarkierung'>Aktiv</span>" : gekauft ?
-                    "<button onclick='window.baumclickerSkinWaehlen(\"" + skin.id + "\")'>Aktivieren</button>" :
-                    "<button onclick='window.baumclickerSkinKaufen(\"" + skin.id + "\")'>Kaufen (" + skin.kosten + " Holz)</button>") + "</div>";
+                skinHtml += "<div class='kartenBox'><b>" + skin.name + "</b><br>" +
+                    (aktiv ? "<span class='aktivMarkierung'>Aktiv</span>" :
+                    gekauft ? "<button onclick='window.baumclickerSkinWaehlen(\"" + skin.id + "\")'>Aktivieren</button>" :
+                    "<button onclick='window.baumclickerSkinKaufen(\"" + skin.id + "\")'>Kaufen (" + skin.kosten + " Holz)</button>") +
+                    "</div>";
             });
-            skinBox.innerHTML = html;
+
+            skinBox.innerHTML = skinHtml;
         }
 
         window.baumclickerSkinKaufen = function (id) {
             const kosten = { standard: 0, winter: 3000, gold: 10000, sakura: 15000, weltenbaum: 25000 }[id] || 999999;
-            if (holz < kosten) { fehlkauf(); return; }
-            holz -= kosten; gekaufteSkins[id] = true; aktiverSkin = id; speichern(); cloudSpeichern(true); aktualisieren(); skinsAktualisieren(); meldungAnzeigen("🎨 Skin gekauft und aktiviert!");
+
+            if (holz < kosten) {
+                fehlkauf();
+                return;
+            }
+
+            holz -= kosten;
+            gekaufteSkins[id] = true;
+            aktiverSkin = id;
+            speichern();
+            cloudSpeichern(true);
+            aktualisieren();
+            skinsAktualisieren();
+            meldungAnzeigen("🎨 Skin gekauft und aktiviert!");
         };
 
         window.baumclickerSkinWaehlen = function (id) {
-            if (!gekaufteSkins[id]) return; aktiverSkin = id; speichern(); cloudSpeichern(true); aktualisieren(); skinsAktualisieren(); meldungAnzeigen("🎨 Skin aktiviert!");
+            if (!gekaufteSkins[id]) return;
+            aktiverSkin = id;
+            speichern();
+            cloudSpeichern(true);
+            aktualisieren();
+            skinsAktualisieren();
+            meldungAnzeigen("🎨 Skin aktiviert!");
         };
 
         async function freundAnfrageSenden() {
             if (!firebaseBereit || !spielerId) return;
+
             const anUid = freundUidInput.value.trim();
-            if (!anUid || anUid === spielerId) { meldungAnzeigen("👥 Bitte gültige Freund-UID eingeben."); return; }
+            if (!anUid || anUid === spielerId) {
+                meldungAnzeigen("👥 Bitte gültige Freund-UID eingeben.");
+                return;
+            }
+
             try {
-                await addDoc(collection(db, "friendRequests"), { vonUid: spielerId, anUid: anUid, vonName: spielerName, status: "offen", erstelltAm: serverTimestamp() });
-                freundUidInput.value = ""; meldungAnzeigen("👥 Anfrage gesendet.");
-            } catch (error) { meldungAnzeigen("👥 Anfrage konnte nicht gesendet werden."); console.error(error); }
+                await addDoc(collection(db, "friendRequests"), {
+                    vonUid: spielerId,
+                    anUid: anUid,
+                    vonName: spielerName,
+                    status: "offen",
+                    erstelltAm: serverTimestamp()
+                });
+
+                freundUidInput.value = "";
+                meldungAnzeigen("👥 Anfrage gesendet.");
+            } catch (error) {
+                meldungAnzeigen("👥 Anfrage konnte nicht gesendet werden.");
+                console.error(error);
+            }
         }
 
         async function freundeLaden() {
             if (!firebaseBereit || !spielerId) return;
-            freundeBox.innerHTML = "Beta-Freundesliste aktiv.<br><br>Deine UID zum Teilen:<br><b>" + sichererText(spielerId) + "</b><br><br>Hinweis: Anfragen werden in dieser Beta gesendet. Annehmen/Verwalten bauen wir im nächsten Bugfix sauber aus.";
+
+            freundeBox.innerHTML = "Beta-Freundesliste aktiv.<br><br>Deine UID zum Teilen:<br><b>" + sichererText(spielerId) + "</b><br><br>" +
+                "Hinweis: Anfragen werden in dieser Beta gesendet. Annehmen/Verwalten bauen wir im nächsten Bugfix sauber aus.";
         }
 
         async function tradeSenden() {
             if (!firebaseBereit || !spielerId) return;
+
             const anUid = tradeUidInput.value.trim();
             const menge = Math.floor(Number(tradeHolzInput.value));
-            if (!anUid || anUid === spielerId || !Number.isFinite(menge) || menge <= 0) { meldungAnzeigen("🔄 Bitte gültige UID und Holzmenge eingeben."); return; }
-            if (holz < menge) { fehlkauf(); return; }
+
+            if (!anUid || anUid === spielerId || !Number.isFinite(menge) || menge <= 0) {
+                meldungAnzeigen("🔄 Bitte gültige UID und Holzmenge eingeben.");
+                return;
+            }
+
+            if (holz < menge) {
+                fehlkauf();
+                return;
+            }
+
             try {
                 holz -= menge;
-                await addDoc(collection(db, "trades"), { vonUid: spielerId, anUid: anUid, vonName: spielerName, typ: "holzGeschenk", holz: menge, status: "offen", erstelltAm: serverTimestamp() });
-                speichern(); cloudSpeichern(true); aktualisieren(); tradeUidInput.value = ""; tradeHolzInput.value = ""; meldungAnzeigen("🔄 Geschenk gesendet.");
-            } catch (error) { holz += menge; meldungAnzeigen("🔄 Geschenk konnte nicht gesendet werden."); console.error(error); }
+                await addDoc(collection(db, "trades"), {
+                    vonUid: spielerId,
+                    anUid: anUid,
+                    vonName: spielerName,
+                    typ: "holzGeschenk",
+                    holz: menge,
+                    status: "offen",
+                    erstelltAm: serverTimestamp()
+                });
+
+                speichern();
+                cloudSpeichern(true);
+                aktualisieren();
+                tradeUidInput.value = "";
+                tradeHolzInput.value = "";
+                meldungAnzeigen("🔄 Geschenk gesendet.");
+            } catch (error) {
+                holz += menge;
+                meldungAnzeigen("🔄 Geschenk konnte nicht gesendet werden.");
+                console.error(error);
+            }
         }
 
         async function tradesLaden() {
             if (!firebaseBereit || !spielerId) return;
+
             tradeBox.innerHTML = "Trading Beta aktiv.<br><br>Aktuell kannst du Holz-Geschenke senden.<br>Annehmen/Einlösen wird im nächsten Schritt eingebaut.";
         }
 
