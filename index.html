@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Baumclicker Beta 2.1</title>
+    <title>Baumclicker Beta 2.3</title>
 
     <style>
         body {
@@ -399,6 +399,58 @@
             font-weight: bold;
         }
 
+        .shopLeuchtet {
+            animation: shopGlow 0.8s infinite alternate;
+            box-shadow: 0 0 18px rgba(255, 235, 80, 0.95);
+            background: #ffe66d !important;
+            font-weight: bold;
+        }
+
+        @keyframes shopGlow {
+            from { transform: scale(1); }
+            to { transform: scale(1.06); }
+        }
+
+        body.theme-winter {
+            background-color: #8fd3ff;
+            background-image: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.55), transparent 18%), linear-gradient(45deg, rgba(255,255,255,0.16) 25%, transparent 25%);
+        }
+
+        body.theme-gold {
+            background-color: #d7a928;
+            background-image: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.35), transparent 16%), linear-gradient(45deg, rgba(0,0,0,0.08) 25%, transparent 25%);
+        }
+
+        body.theme-kristall {
+            background-color: #56c7e8;
+            background-image: linear-gradient(135deg, rgba(255,255,255,0.32) 25%, transparent 25%), linear-gradient(45deg, rgba(0,60,120,0.18) 25%, transparent 25%);
+        }
+
+        body.theme-goetter {
+            background-color: #efe1a0;
+            background-image: radial-gradient(circle at 50% 5%, rgba(255,255,255,0.85), transparent 22%), linear-gradient(135deg, rgba(255,215,0,0.30) 25%, transparent 25%);
+        }
+
+        body.theme-winter .fenster, body.theme-winter .shopBereich { background: #f3fbff; border-color: #9bd6ff; }
+        body.theme-gold .fenster, body.theme-gold .shopBereich { background: #fff6d7; border-color: #d7a928; }
+        body.theme-kristall .fenster, body.theme-kristall .shopBereich { background: #eefcff; border-color: #58c7e8; }
+        body.theme-goetter .fenster, body.theme-goetter .shopBereich { background: #fff9dc; border-color: #d9b84d; }
+
+        .schneeFlocke {
+            position: fixed;
+            top: -30px;
+            pointer-events: none;
+            z-index: 0;
+            animation: schneeFall 4s linear forwards;
+            color: white;
+            text-shadow: 0 0 8px #fff;
+        }
+
+        @keyframes schneeFall {
+            from { transform: translateY(-30px); opacity: 1; }
+            to { transform: translateY(110vh); opacity: 0; }
+        }
+
 
         #statistikBereich {
             margin-top: 20px;
@@ -534,7 +586,6 @@
         <div id="statusZeile">
             <div id="prestigeAnzeige" class="statusChip">⭐ Prestige: 0 | Bonus: 0%</div>
             <div id="wetterAnzeige" class="statusChip">🌦️ Wetter in: 05:00</div>
-            <div id="effektAnzeige" class="statusChip">✨ Effekte: Keine</div>
             <div id="onlineAnzeige" class="statusChip">☁️ Online: wird verbunden...</div>
         </div>
 
@@ -548,6 +599,7 @@
                     <button id="wetterButton">✨ Effekte</button>
                     <button id="bugButton">🐞 Fehler melden</button>
                     <button id="achievementButton">🏅 Erfolge</button>
+                    <button id="dailyButton">🎯 Tagesaufgaben</button>
                     <button id="aenderungenButton">📝 Änderungen</button>
                     <button id="einstellungenButton">⚙️ Einstellungen</button>
                     <button id="haustierButton">🐾 Haustiere</button>
@@ -581,7 +633,7 @@
 
     <div id="meldung"></div>
     <div id="overlay"></div>
-    <div id="betaAnzeige">Beta 2.1</div>
+    <div id="betaAnzeige">Beta 2.3</div>
 
     <div id="shop" class="fenster">
         <h2>🏪 Shop</h2>
@@ -670,16 +722,27 @@
         <div id="achievementBox"></div>
     </div>
 
+
+    <div id="dailyFenster" class="fenster">
+        <h2>🎯 Tagesaufgaben</h2>
+        <button id="dailySchliessenButton">❌ Schließen</button>
+        <div class="hinweis">Neue Aufgaben gibt es täglich. Beta 2.3 Testsystem.</div>
+        <div id="dailyBox" class="kartenBox">Noch nicht geladen.</div>
+        <button id="dailyBelohnungButton">🎁 Tagesbelohnung abholen</button>
+    </div>
+
     <div id="aenderungenFenster" class="fenster">
         <h2>📝 Änderungen & Behebungen</h2>
         <button id="aenderungenSchliessenButton">❌ Schließen</button>
         <div id="aenderungenBox">
-            <h3>Beta 2.1</h3>
+            <h3>Beta 2.3</h3>
             <ul>
-                <li>☁️ Cloud-Fix: Beim Login auf einem anderen Browser wird der Cloud-Spielstand zuerst geladen.</li>
-                <li>🛡️ Leere lokale Spielstände können vorhandene Cloud-Spielstände nicht mehr automatisch überschreiben.</li>
-                <li>⚡ Automatisches Cloud-Speichern jede Sekunde wurde entfernt.</li>
-                <li>👆 Klickspeed bleibt bei maximal 20 Klicks pro Sekunde.</li>
+                <li>🎯 Tagesaufgaben eingebaut.</li>
+                <li>🏪 Shop-Button leuchtet, wenn etwas kaufbar ist.</li>
+                <li>🎨 Theme-System als Admin-Test eingebaut.</li>
+                <li>❄️ Winter-, Gold-, Kristall- und Götterwelt können vom Admin getestet werden.</li>
+                <li>☁️ Cloud-Speicher gegen leere Überschreibungen abgesichert.</li>
+                <li>👑 V1-Testfunktionen für Admin vorbereitet.</li>
             </ul>
 
             <h3>Beta 2.0</h3>
@@ -733,7 +796,7 @@
             <input id="loginPasswortInput" type="password" placeholder="Passwort">
             <button id="loginButton">🔐 Anmelden</button>
             <button id="registerButton">📝 Registrieren</button>
-            <div class="hinweis">Für Beta 2.1 brauchst du ein Konto. Dein Spielstand wird sicher in der Cloud gespeichert.</div>
+            <div class="hinweis">Für Beta 2.3 brauchst du ein Konto. Dein Spielstand wird sicher in der Cloud gespeichert.</div>
         </div>
     </div>
 
@@ -821,6 +884,23 @@
             <button id="adminResetButton">Eigenen Spielstand zurücksetzen</button>
         </div>
 
+
+        <div class="shopBereich">
+            <h3>🧪 V1-Testlabor</h3>
+            <button id="adminV1BalancingButton">Prestige-Balancing testen: AUS</button>
+            <button id="adminShopLocksButton">Shop-Freischaltungen testen: AUS</button>
+            <div class="hinweis">Diese Tests sind nur für Admin sichtbar und gelten aktuell nur für deinen Spielstand.</div>
+        </div>
+
+        <div class="shopBereich">
+            <h3>🎨 Theme-Test</h3>
+            <button id="adminThemeStandardButton">🌳 Standardwelt</button>
+            <button id="adminThemeWinterButton">❄️ Winterwelt</button>
+            <button id="adminThemeGoldButton">🥇 Goldwelt</button>
+            <button id="adminThemeKristallButton">💎 Kristallwelt</button>
+            <button id="adminThemeGoetterButton">👑 Götterwelt</button>
+        </div>
+
         <div class="shopBereich">
             <h3>⚙️ Werte setzen</h3>
             <div class="adminGrid">
@@ -903,7 +983,7 @@
         const WETTER_CHECK_SEKUNDEN = 300;
         const WETTER_CHANCE = 0.30;
         const LUCKY_BLOCK_KOSTEN_KLICKS = 200;
-        const SPIEL_VERSION = "2.1";
+        const SPIEL_VERSION = "2.3";
         const OFFLINE_MAX_SEKUNDEN = 60 * 60 * 8;
         const ADMIN_IDS = [
             "I4tKxmYCr9NQC3WtUwJ5dU4SXn02"
@@ -982,7 +1062,12 @@
         let aktiveHaustiere = {};
         let aktiverSkin = "standard";
         let gekaufteSkins = { standard: true };
-        let effektEndeZeiten = {};
+        let dailyAufgabenTag = "";
+        let dailyAufgaben = [];
+        let dailyBelohnungGeholt = false;
+        let aktivesTheme = "standard";
+        let adminV1BalancingAktiv = false;
+        let adminShopLocksAktiv = false;
 
         const klickAnzeige = document.getElementById("klickAnzeige");
         const holzAnzeige = document.getElementById("holzAnzeige");
@@ -992,7 +1077,6 @@
         const holzProSekundeAnzeige = document.getElementById("holzProSekundeAnzeige");
         const prestigeAnzeige = document.getElementById("prestigeAnzeige");
         const wetterAnzeige = document.getElementById("wetterAnzeige");
-        const effektAnzeige = document.getElementById("effektAnzeige");
         const verwarnungAnzeige = document.getElementById("verwarnungAnzeige");
         const onlineAnzeige = document.getElementById("onlineAnzeige");
         const baumAnzeige = document.getElementById("baum");
@@ -1025,6 +1109,11 @@
         const achievementFenster = document.getElementById("achievementFenster");
         const achievementSchliessenButton = document.getElementById("achievementSchliessenButton");
         const achievementBox = document.getElementById("achievementBox");
+        const dailyButton = document.getElementById("dailyButton");
+        const dailyFenster = document.getElementById("dailyFenster");
+        const dailySchliessenButton = document.getElementById("dailySchliessenButton");
+        const dailyBox = document.getElementById("dailyBox");
+        const dailyBelohnungButton = document.getElementById("dailyBelohnungButton");
         const aenderungenButton = document.getElementById("aenderungenButton");
         const aenderungenFenster = document.getElementById("aenderungenFenster");
         const aenderungenSchliessenButton = document.getElementById("aenderungenSchliessenButton");
@@ -1109,6 +1198,13 @@
         const luckyBlockButton = document.getElementById("luckyBlockButton");
         const weltenbaumAnzeige = document.getElementById("weltenbaumAnzeige");
         const adminResetButton = document.getElementById("adminResetButton");
+        const adminV1BalancingButton = document.getElementById("adminV1BalancingButton");
+        const adminShopLocksButton = document.getElementById("adminShopLocksButton");
+        const adminThemeStandardButton = document.getElementById("adminThemeStandardButton");
+        const adminThemeWinterButton = document.getElementById("adminThemeWinterButton");
+        const adminThemeGoldButton = document.getElementById("adminThemeGoldButton");
+        const adminThemeKristallButton = document.getElementById("adminThemeKristallButton");
+        const adminThemeGoetterButton = document.getElementById("adminThemeGoetterButton");
         const adminLuckyButton = document.getElementById("adminLuckyButton");
         const adminRegenbogenButton = document.getElementById("adminRegenbogenButton");
         const adminSamenButton = document.getElementById("adminSamenButton");
@@ -1140,11 +1236,12 @@
             spielerNameInput.value = spielerName;
             startNameInput.value = spielerName;
         }
+        dailyAufgabenInitialisieren();
+        themeAnwenden();
         aktualisieren();
         firebaseStarten();
         loginFensterAnzeigen();
         setInterval(versionPruefen, 60000);
-
 
         window.addEventListener("pagehide", function () {
             speichern();
@@ -1266,6 +1363,7 @@
                 resetOhnePrestigeVerlust();
 
                 meldungAnzeigen("⭐ Prestige! +1 Prestige-Punkt");
+                dailyAufgabeFortschritt("prestige", 1);
                 speichern();
                 onlineSpeichern(true);
                 cloudSpeichern(true);
@@ -1491,6 +1589,31 @@
             adminInfoAktualisieren();
         });
 
+        adminV1BalancingButton.addEventListener("click", function () {
+            if (!istAdmin) return;
+            adminV1BalancingAktiv = !adminV1BalancingAktiv;
+            speichern();
+            aktualisieren();
+            adminInfoAktualisieren();
+            meldungAnzeigen("👑 V1-Prestige-Balancing: " + (adminV1BalancingAktiv ? "AN" : "AUS"));
+        });
+
+        adminShopLocksButton.addEventListener("click", function () {
+            if (!istAdmin) return;
+            adminShopLocksAktiv = !adminShopLocksAktiv;
+            speichern();
+            aktualisieren();
+            adminInfoAktualisieren();
+            meldungAnzeigen("👑 Shop-Freischaltungen: " + (adminShopLocksAktiv ? "AN" : "AUS"));
+        });
+
+        adminThemeStandardButton.addEventListener("click", function () { adminThemeSetzen("standard"); });
+        adminThemeWinterButton.addEventListener("click", function () { adminThemeSetzen("winter"); });
+        adminThemeGoldButton.addEventListener("click", function () { adminThemeSetzen("gold"); });
+        adminThemeKristallButton.addEventListener("click", function () { adminThemeSetzen("kristall"); });
+        adminThemeGoetterButton.addEventListener("click", function () { adminThemeSetzen("goetter"); });
+
+
         adminHolzSetzenButton.addEventListener("click", function () { adminWertSetzen("holz", adminHolzInput.value); });
         adminHolzPlusButton.addEventListener("click", function () { adminWertAddieren("holz", adminHolzInput.value); });
         adminKlicksSetzenButton.addEventListener("click", function () { adminWertSetzen("klicks", adminKlicksInput.value); });
@@ -1531,7 +1654,7 @@
             }
 
             wetterOptikAktualisieren();
-            effektAnzeigeAktualisieren();
+            themePartikelAktualisieren();
             aktualisieren();
         }, 1000);
 
@@ -1559,6 +1682,7 @@
             const verdienst = berechneKlickVerdienst();
             klicks++;
             gesamtKlicksAllzeit++;
+            dailyAufgabeFortschritt("klicks", 1);
             holz += verdienst;
             gesamtHolz += verdienst;
             speichern();
@@ -1600,6 +1724,7 @@
             wetterFenster.style.display = "none";
             ranglisteFenster.style.display = "none";
             achievementFenster.style.display = "none";
+            dailyFenster.style.display = "none";
             aenderungenFenster.style.display = "none";
             einstellungenFenster.style.display = "none";
             haustierFenster.style.display = "none";
@@ -1654,43 +1779,6 @@
             }
         }
 
-
-        function effektStarten(id, name, dauerSekunden) {
-            effektEndeZeiten[id] = {
-                name: name,
-                ende: Date.now() + dauerSekunden * 1000
-            };
-            effektAnzeigeAktualisieren();
-        }
-
-        function effektBeenden(id) {
-            delete effektEndeZeiten[id];
-            effektAnzeigeAktualisieren();
-        }
-
-        function effektAnzeigeAktualisieren() {
-            const jetzt = Date.now();
-            const aktiveTexte = [];
-
-            Object.keys(effektEndeZeiten).forEach(function (id) {
-                const effekt = effektEndeZeiten[id];
-
-                if (!effekt || effekt.ende <= jetzt) {
-                    delete effektEndeZeiten[id];
-                    return;
-                }
-
-                const restSekunden = Math.ceil((effekt.ende - jetzt) / 1000);
-                aktiveTexte.push(effekt.name + " " + formatiereZeit(restSekunden));
-            });
-
-            if (aktiveTexte.length === 0) {
-                effektAnzeige.textContent = "✨ Effekte: Keine";
-            } else {
-                effektAnzeige.textContent = "✨ Effekte: " + aktiveTexte.join(" | ");
-            }
-        }
-
         function wetterOptikAktualisieren() {
             if (aktivesWetter.includes("Regen")) {
                 if (Math.random() < 0.45) {
@@ -1740,6 +1828,7 @@
 
             klicks -= LUCKY_BLOCK_KOSTEN_KLICKS;
             luckyBlockAusloesen(true);
+            dailyAufgabeFortschritt("lucky", 1);
             speichern();
             onlineSpeichern(false);
             cloudSpeichern(true);
@@ -1788,6 +1877,9 @@
                 verwarnungGeben("⚠️ Lucky Block Pech! +1 Verwarnung.");
             }
 
+            shopHinweisAktualisieren();
+            dailyAufgabenAktualisieren(false);
+            themeAnwenden(false);
             achievementPruefen();
         }
 
@@ -1796,13 +1888,11 @@
             luckyBonusKlick = 1.15;
             luckyBonusSekunde = 1.15;
             meldungAnzeigen("🚀 Lucky Booster! 60 Sekunden +15% auf Holz!");
-            effektStarten("luckyBooster", "🚀 Booster", 60);
 
             setTimeout(function () {
                 luckyBoosterAktiv = false;
                 luckyBonusKlick = 1;
                 luckyBonusSekunde = 1;
-                effektBeenden("luckyBooster");
                 speichern();
                 aktualisieren();
             }, 60000);
@@ -1815,14 +1905,12 @@
             wetterBonusKlick = 2;
             wetterBonusSekunde = 2;
             meldungAnzeigen("🌈 GOLDENER REGENBOGEN! 60 Sekunden doppelter Ertrag!");
-            effektStarten("regenbogen", "🌈 Regenbogen", 60);
 
             setTimeout(function () {
                 wetterBonusKlick = 1;
                 wetterBonusSekunde = 1;
                 aktivesWetter = "Kein Wetter";
                 wetterIcon.textContent = "🌤️";
-                effektBeenden("regenbogen");
                 speichern();
                 aktualisieren();
             }, 60000);
@@ -1872,13 +1960,11 @@
                     wetterIcon.textContent = "☀️";
                     wetterBonusKlick = 1.2;
                     meldungAnzeigen("☀️ Sonne! 60 Sekunden +20% Holz pro Klick!");
-                    effektStarten("wetter", "☀️ Sonne", 60);
 
                     setTimeout(function () {
                         wetterBonusKlick = 1;
                         aktivesWetter = "Kein Wetter";
                         wetterIcon.textContent = "🌤️";
-                        effektBeenden("wetter");
                         speichern();
                         aktualisieren();
                     }, 60000);
@@ -1890,13 +1976,11 @@
                     wetterIcon.textContent = "🌧️";
                     wetterBonusSekunde = 1.5;
                     meldungAnzeigen("🌧️ Regen! 60 Sekunden +50% Holz pro Sekunde!");
-                    effektStarten("wetter", "🌧️ Regen", 60);
 
                     setTimeout(function () {
                         wetterBonusSekunde = 1;
                         aktivesWetter = "Kein Wetter";
                         wetterIcon.textContent = "🌤️";
-                        effektBeenden("wetter");
                         speichern();
                         aktualisieren();
                     }, 60000);
@@ -1907,12 +1991,10 @@
                     aktivesWetter = "⛈️ Sturm: +1 Verwarnung";
                     wetterIcon.textContent = "⛈️";
                     verwarnungGeben("⛈️ Sturm! Du bekommst eine Verwarnung!");
-                    effektStarten("wetter", "⛈️ Sturm", 60);
 
                     setTimeout(function () {
                         aktivesWetter = "Kein Wetter";
                         wetterIcon.textContent = "🌤️";
-                        effektBeenden("wetter");
                         speichern();
                         aktualisieren();
                     }, 60000);
@@ -1926,12 +2008,10 @@
                     holz += bonusHolz;
                     gesamtHolz += bonusHolz;
                     meldungAnzeigen("🍃 Wind! +" + bonusHolz + " Holz!");
-                    effektStarten("wetter", "🍃 Wind", 60);
 
                     setTimeout(function () {
                         aktivesWetter = "Kein Wetter";
                         wetterIcon.textContent = "🌤️";
-                        effektBeenden("wetter");
                         speichern();
                         aktualisieren();
                     }, 60000);
@@ -1940,7 +2020,6 @@
                 keinWetterAnzahl++;
                 aktivesWetter = "Kein Wetter";
                 wetterIcon.textContent = "🌤️";
-                effektBeenden("wetter");
                 meldungAnzeigen("🌦️ Kein Wetter passiert.");
             }
 
@@ -1953,6 +2032,11 @@
         }
 
         function berechnePrestigeKosten() {
+            if (istAdmin && adminV1BalancingAktiv) {
+                const kosten = [100000, 500000, 2500000, 10000000, 50000000, 250000000, 1000000000, 5000000000, 25000000000, 100000000000];
+                return kosten[prestigePunkte] || Math.floor(100000000000 * Math.pow(5, Math.max(0, prestigePunkte - 9)));
+            }
+
             return 2000 * (prestigePunkte + 1);
         }
 
@@ -1980,6 +2064,7 @@
                 if (name === "biber") biberKosten = Math.floor(biberKosten * 1.45);
                 if (name === "baer") baerKosten = Math.floor(baerKosten * 1.45);
 
+                dailyAufgabeFortschritt("upgrades", 1);
                 speichern();
                 onlineSpeichern(false);
                 cloudSpeichern(true);
@@ -2036,7 +2121,6 @@
             }
 
             speichern();
-            cloudSpeichern(true);
             aktualisieren();
         }
 
@@ -2104,6 +2188,13 @@
             aktiveHaustiere = {};
             aktiverSkin = "standard";
             gekaufteSkins = { standard: true };
+            dailyAufgabenTag = "";
+            dailyAufgaben = [];
+            dailyBelohnungGeholt = false;
+            aktivesTheme = "standard";
+            adminV1BalancingAktiv = false;
+            adminShopLocksAktiv = false;
+            themeAnwenden();
             onlineZuruecksetzen();
         }
 
@@ -2135,7 +2226,9 @@
                 luckyHolzBonusAnzahl, luckyBoosterAnzahl, luckyGratisItemAnzahl,
                 luckyWeltenbaumAnzahl, luckyPrestigeAnzahl, luckyPechAnzahl,
                 achievements,
-                aktiveHaustiere, aktiverSkin, gekaufteSkins
+                aktiveHaustiere, aktiverSkin, gekaufteSkins,
+                dailyAufgabenTag, dailyAufgaben, dailyBelohnungGeholt,
+                aktivesTheme, adminV1BalancingAktiv, adminShopLocksAktiv
             };
 
             localStorage.setItem(SAVE_KEY, JSON.stringify(spielstand));
@@ -2204,6 +2297,12 @@
                 aktiveHaustiere = spielstand.aktiveHaustiere || {};
                 aktiverSkin = spielstand.aktiverSkin || "standard";
                 gekaufteSkins = spielstand.gekaufteSkins || { standard: true };
+                dailyAufgabenTag = spielstand.dailyAufgabenTag || "";
+                dailyAufgaben = Array.isArray(spielstand.dailyAufgaben) ? spielstand.dailyAufgaben : [];
+                dailyBelohnungGeholt = spielstand.dailyBelohnungGeholt || false;
+                aktivesTheme = spielstand.aktivesTheme || "standard";
+                adminV1BalancingAktiv = spielstand.adminV1BalancingAktiv || false;
+                adminShopLocksAktiv = spielstand.adminShopLocksAktiv || false;
             }
         }
 
@@ -2345,7 +2444,6 @@
                 "⭐ Prestige-Bonus: +1 Prestige-Punkt — bisher " + luckyPrestigeAnzahl + "x<br>" +
                 "⚠️ Pech: +1 Verwarnung — bisher " + luckyPechAnzahl + "x";
 
-            effektAnzeigeAktualisieren();
             achievementPruefen();
         }
 
@@ -2452,8 +2550,14 @@
                 "Holz: " + holz + "<br>" +
                 "Gesamt-Holz: " + gesamtHolz + "<br>" +
                 "HPK: " + holzProKlick + " | HPS: " + holzProSekunde + "<br>" +
-                "Prestige: " + prestigePunkte + "<br><br>" +
+                "Prestige: " + prestigePunkte + "<br>" +
+                "Theme: " + sichererText(aktivesTheme) + "<br>" +
+                "V1-Balancing: " + (adminV1BalancingAktiv ? "AN" : "AUS") + "<br>" +
+                "Shop-Locks: " + (adminShopLocksAktiv ? "AN" : "AUS") + "<br><br>" +
                 "<b>Hinweis:</b> Admins werden nicht in der Rangliste gewertet.";
+
+            adminV1BalancingButton.textContent = "Prestige-Balancing testen: " + (adminV1BalancingAktiv ? "AN" : "AUS");
+            adminShopLocksButton.textContent = "Shop-Freischaltungen testen: " + (adminShopLocksAktiv ? "AN" : "AUS");
         }
 
 
@@ -2482,7 +2586,8 @@
                         "<b>" + sichererText(report.name || "Spieler") + "</b> " +
                         "<span>⭐ " + (report.prestige || 0) + " | 🪵 " + (report.gesamtHolz || 0) + "</span><br>" +
                         "<small>ID: " + sichererText(report.spielerId || "unbekannt") + "</small><br>" +
-                        sichererText(report.text || "") +
+                        sichererText(report.text || "") + "<br>" +
+                        ((report.erledigt === true) ? "<b style='color:green'>✅ Erledigt</b>" : "<button onclick=\"window.bugReportErledigt('" + dokument.id + "')\">✅ Als erledigt markieren</button>") +
                         "</div>";
                 });
 
@@ -2534,6 +2639,11 @@
             if (luckyBlocksGekauft >= 1) achievementFreischalten("lucky1", "Erster Lucky Block");
             if (luckySpezialwetterAnzahl >= 1) achievementFreischalten("regenbogen1", "Goldener Regenbogen");
             if (weltenbaumSamen) achievementFreischalten("weltenbaum1", "Weltenbaum-Samen gefunden");
+            if (prestigePunkte >= 5) achievementFreischalten("prestige5", "Prestige 5");
+            if (prestigePunkte >= 10) achievementFreischalten("prestige10", "Prestige 10");
+            if (luckyBlocksGekauft >= 100) achievementFreischalten("lucky100", "100 Lucky Blocks");
+            if (gesamtHolz >= 1000000) achievementFreischalten("holz1m", "1.000.000 Gesamt-Holz");
+            if (gesamtHolz >= 10000000) achievementFreischalten("holz10m", "10.000.000 Gesamt-Holz");
         }
 
         function achievementListeAktualisieren() {
@@ -2544,7 +2654,12 @@
                 ["prestige1", "Erstes Prestige"],
                 ["lucky1", "Erster Lucky Block"],
                 ["regenbogen1", "Goldener Regenbogen erlebt"],
-                ["weltenbaum1", "Weltenbaum-Samen gefunden"]
+                ["weltenbaum1", "Weltenbaum-Samen gefunden"],
+                ["prestige5", "Prestige 5 erreicht"],
+                ["prestige10", "Prestige 10 erreicht"],
+                ["lucky100", "100 Lucky Blocks"],
+                ["holz1m", "1.000.000 Gesamt-Holz"],
+                ["holz10m", "10.000.000 Gesamt-Holz"]
             ];
 
             let html = "";
@@ -2711,7 +2826,6 @@
                 }, { merge: true });
 
                 onlineAnzeige.textContent = istAdmin ? "☁️ Cloud gespeichert | 👑 Admin" : "☁️ Cloud gespeichert";
-                cloudGeladen = true;
             } catch (error) {
                 onlineAnzeige.textContent = "☁️ Cloud-Speichern fehlgeschlagen";
                 console.error(error);
@@ -2744,6 +2858,8 @@
 
                 localStorage.setItem(SAVE_KEY, JSON.stringify(cloudStand));
                 laden();
+                dailyAufgabenInitialisieren();
+                themeAnwenden();
                 cloudGeladen = true;
                 cloudStartGeprueft = true;
                 aktualisieren();
@@ -2959,6 +3075,151 @@
             if (!firebaseBereit || !spielerId) return;
 
             tradeBox.innerHTML = "Trading Beta aktiv.<br><br>Aktuell kannst du Holz-Geschenke senden.<br>Annehmen/Einlösen wird im nächsten Schritt eingebaut.";
+        }
+
+
+        function heutigerTagKey() {
+            return new Date().toISOString().slice(0, 10);
+        }
+
+        function dailyAufgabenInitialisieren() {
+            const heute = heutigerTagKey();
+
+            if (dailyAufgabenTag === heute && Array.isArray(dailyAufgaben) && dailyAufgaben.length > 0) {
+                return;
+            }
+
+            dailyAufgabenTag = heute;
+            dailyBelohnungGeholt = false;
+            dailyAufgaben = [
+                { id: "klicks", text: "Klicke 500 Mal", ziel: 500, fortschritt: 0 },
+                { id: "upgrades", text: "Kaufe 3 Upgrades", ziel: 3, fortschritt: 0 },
+                { id: "lucky", text: "Öffne 1 Lucky Block", ziel: 1, fortschritt: 0 }
+            ];
+            speichern();
+        }
+
+        function dailyAufgabeFortschritt(id, wert) {
+            dailyAufgabenInitialisieren();
+
+            dailyAufgaben.forEach(function (aufgabe) {
+                if (aufgabe.id === id) {
+                    aufgabe.fortschritt = Math.min(aufgabe.ziel, (aufgabe.fortschritt || 0) + wert);
+                }
+            });
+        }
+
+        function dailyAlleFertig() {
+            dailyAufgabenInitialisieren();
+            return dailyAufgaben.every(function (aufgabe) {
+                return (aufgabe.fortschritt || 0) >= aufgabe.ziel;
+            });
+        }
+
+        function dailyAufgabenAktualisieren(sichtbar) {
+            if (!dailyBox) return;
+
+            dailyAufgabenInitialisieren();
+
+            let html = "<b>Heute:</b> " + dailyAufgabenTag + "<br><br>";
+            dailyAufgaben.forEach(function (aufgabe) {
+                const fertig = (aufgabe.fortschritt || 0) >= aufgabe.ziel;
+                html += (fertig ? "✅ " : "⬜ ") + sichererText(aufgabe.text) + " — " + Math.min(aufgabe.fortschritt || 0, aufgabe.ziel) + "/" + aufgabe.ziel + "<br>";
+            });
+
+            html += "<br><b>Belohnung:</b> 2 Lucky Blocks + Bonus-Holz<br>";
+            html += dailyBelohnungGeholt ? "✅ Belohnung bereits abgeholt" : (dailyAlleFertig() ? "🎁 Belohnung bereit!" : "⏳ Aufgaben noch nicht fertig");
+
+            dailyBox.innerHTML = html;
+            dailyBelohnungButton.disabled = dailyBelohnungGeholt || !dailyAlleFertig();
+        }
+
+        function dailyBelohnungAbholen() {
+            dailyAufgabenInitialisieren();
+
+            if (dailyBelohnungGeholt) {
+                meldungAnzeigen("🎯 Tagesbelohnung wurde schon abgeholt.");
+                return;
+            }
+
+            if (!dailyAlleFertig()) {
+                meldungAnzeigen("🎯 Erst alle Tagesaufgaben abschließen.");
+                return;
+            }
+
+            const bonus = 5000 + prestigePunkte * 2500;
+            holz += bonus;
+            gesamtHolz += bonus;
+            luckyBlockAusloesen(false);
+            luckyBlockAusloesen(false);
+            dailyBelohnungGeholt = true;
+            speichern();
+            cloudSpeichern(true);
+            aktualisieren();
+            dailyAufgabenAktualisieren(true);
+            meldungAnzeigen("🎁 Tagesbelohnung: +" + bonus + " Holz und 2 Lucky Blocks!");
+        }
+
+        function shopKannGekauftWerden() {
+            return holz >= holzfaellerKosten
+                || holz >= foersterKosten
+                || holz >= holzlagerKosten
+                || holz >= saegewerkKosten
+                || holz >= eichhoernchenKosten
+                || holz >= biberKosten
+                || holz >= baerKosten
+                || (!axtGekauft && holz >= 100)
+                || (!eisenAxtGekauft && holz >= 750)
+                || (!motorsaegeGekauft && holz >= 1500)
+                || (!goldAxtGekauft && holz >= 2500)
+                || (!diamantAxtGekauft && holz >= 7500)
+                || (verwarnungen > 0 && holz >= 2000)
+                || klicks >= LUCKY_BLOCK_KOSTEN_KLICKS;
+        }
+
+        function shopHinweisAktualisieren() {
+            if (shopKannGekauftWerden()) {
+                shopOeffnenButton.classList.add("shopLeuchtet");
+                shopOeffnenButton.textContent = "🏪 Shop ✨";
+            } else {
+                shopOeffnenButton.classList.remove("shopLeuchtet");
+                shopOeffnenButton.textContent = "🏪 Shop";
+            }
+        }
+
+        function adminThemeSetzen(theme) {
+            if (!istAdmin) return;
+            aktivesTheme = theme;
+            themeAnwenden(true);
+            speichern();
+            cloudSpeichern(true);
+            adminInfoAktualisieren();
+            meldungAnzeigen("🎨 Theme gesetzt: " + theme);
+        }
+
+        function themeAnwenden(meldung) {
+            document.body.classList.remove("theme-winter", "theme-gold", "theme-kristall", "theme-goetter");
+
+            if (aktivesTheme && aktivesTheme !== "standard") {
+                document.body.classList.add("theme-" + aktivesTheme);
+            }
+
+            if (aktivesTheme === "winter") baumAnzeige.textContent = "🎄";
+            if (aktivesTheme === "gold") baumAnzeige.textContent = "🌟";
+            if (aktivesTheme === "kristall") baumAnzeige.textContent = "💎🌳";
+            if (aktivesTheme === "goetter") baumAnzeige.textContent = "👑🌳";
+        }
+
+        function themePartikelAktualisieren() {
+            if (aktivesTheme === "winter" && Math.random() < 0.25) {
+                const flocke = document.createElement("div");
+                flocke.className = "schneeFlocke";
+                flocke.textContent = "❄️";
+                flocke.style.left = Math.floor(Math.random() * 100) + "vw";
+                flocke.style.fontSize = (14 + Math.floor(Math.random() * 18)) + "px";
+                document.body.appendChild(flocke);
+                setTimeout(function () { flocke.remove(); }, 4200);
+            }
         }
 
         async function versionPruefen() {
