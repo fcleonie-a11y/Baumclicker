@@ -1602,9 +1602,10 @@
             if (!istAdmin) return;
             adminShopLocksAktiv = !adminShopLocksAktiv;
             speichern();
+            cloudSpeichern(true);
             aktualisieren();
             adminInfoAktualisieren();
-            meldungAnzeigen("👑 Shop-Freischaltungen: " + (adminShopLocksAktiv ? "AN" : "AUS"));
+            meldungAnzeigen("👑 Shop-Freischaltungen: " + (adminShopLocksAktiv ? "AN — Items werden nach Prestige gesperrt." : "AUS — alle Items normal verfügbar."));
         });
 
         adminThemeStandardButton.addEventListener("click", function () { adminThemeSetzen("standard"); });
@@ -1739,6 +1740,11 @@
         }
 
         function einmalKlickUpgradeKaufen(name, kosten, plusKlick) {
+            if (!istShopItemFreigeschaltet(name)) {
+                meldungAnzeigen("🔒 Dieses Klick-Item ist erst ab Prestige " + shopPrestigeAnforderung(name) + " verfügbar.");
+                return;
+            }
+
             if (name === "axt" && axtGekauft) return;
             if (name === "eisenAxt" && eisenAxtGekauft) return;
             if (name === "motorsaege" && motorsaegeGekauft) return;
@@ -2049,6 +2055,11 @@
         }
 
         function upgradeKaufen(name, kosten, plusKlick, plusSekunde) {
+            if (!istShopItemFreigeschaltet(name)) {
+                meldungAnzeigen("🔒 Dieses Shop-Item ist erst ab Prestige " + shopPrestigeAnforderung(name) + " verfügbar.");
+                return;
+            }
+
             if (holz >= kosten) {
                 holz -= kosten;
                 holzProKlick += plusKlick;
@@ -2378,6 +2389,8 @@
             updateEinmalButton(motorsaegeButton, motorsaegeGekauft, "⚡ Motorsäge (1500 Holz) +10/Klick", "⚡ Motorsäge: GEKAUFT");
             updateEinmalButton(goldAxtButton, goldAxtGekauft, "🟡 Gold-Axt (2500 Holz) +8/Klick", "🟡 Gold-Axt: GEKAUFT");
             updateEinmalButton(diamantAxtButton, diamantAxtGekauft, "💎 Diamant-Axt (7500 Holz) +20/Klick", "💎 Diamant-Axt: GEKAUFT");
+
+            applyShopLocksAktualisieren();
 
             prestigeButton.textContent = "⭐ Prestige durchführen (" + berechnePrestigeKosten() + " Gesamt-Holz)";
             prestigeButton.style.display = gesamtHolz >= berechnePrestigeKosten() ? "inline-block" : "none";
@@ -3160,19 +3173,77 @@
             meldungAnzeigen("🎁 Tagesbelohnung: +" + bonus + " Holz und 2 Lucky Blocks!");
         }
 
+        function shopPrestigeAnforderung(name) {
+            const anforderungen = {
+                axt: 0,
+                holzfaeller: 0,
+                eichhoernchen: 0,
+                eisenAxt: 1,
+                foerster: 1,
+                holzlager: 2,
+                motorsaege: 2,
+                goldAxt: 4,
+                biber: 4,
+                saegewerk: 5,
+                diamantAxt: 6,
+                baer: 6,
+                luckyBlock: 0,
+                versicherung: 0
+            };
+
+            return anforderungen[name] || 0;
+        }
+
+        function istShopItemFreigeschaltet(name) {
+            if (!istAdmin || !adminShopLocksAktiv) return true;
+            return prestigePunkte >= shopPrestigeAnforderung(name);
+        }
+
+        function shopLockText(name, text) {
+            const benoetigt = shopPrestigeAnforderung(name);
+            if (benoetigt <= 0) return text;
+            return "🔒 Ab Prestige " + benoetigt + ": " + text;
+        }
+
+        function setzeShopLock(button, name, basisText) {
+            if (!button) return;
+
+            if (!istShopItemFreigeschaltet(name)) {
+                button.disabled = true;
+                button.textContent = shopLockText(name, basisText || button.textContent);
+            }
+        }
+
+        function applyShopLocksAktualisieren() {
+            setzeShopLock(holzfaellerButton, "holzfaeller", "🪓 Holzfäller (" + holzfaellerKosten + " Holz) +1/Sek");
+            setzeShopLock(foersterButton, "foerster", "🌲 Förster (" + foersterKosten + " Holz) +5/Sek");
+            setzeShopLock(holzlagerButton, "holzlager", "🏕️ Holzlager (" + holzlagerKosten + " Holz) +10/Sek");
+            setzeShopLock(saegewerkButton, "saegewerk", "🏭 Sägewerk (" + saegewerkKosten + " Holz) +25/Sek");
+
+            setzeShopLock(eichhoernchenButton, "eichhoernchen", "🐿️ Eichhörnchen (" + eichhoernchenKosten + " Holz) +2/Sek");
+            setzeShopLock(biberButton, "biber", "🦫 Biber (" + biberKosten + " Holz) +15/Sek");
+            setzeShopLock(baerButton, "baer", "🐻 Bär (" + baerKosten + " Holz) +50/Sek");
+
+            if (!axtGekauft) setzeShopLock(axtButton, "axt", "🔨 Bessere Axt (100 Holz) +1/Klick");
+            if (!eisenAxtGekauft) setzeShopLock(eisenAxtButton, "eisenAxt", "⛏️ Eisen-Axt (750 Holz) +3/Klick");
+            if (!motorsaegeGekauft) setzeShopLock(motorsaegeButton, "motorsaege", "⚡ Motorsäge (1500 Holz) +10/Klick");
+            if (!goldAxtGekauft) setzeShopLock(goldAxtButton, "goldAxt", "🟡 Gold-Axt (2500 Holz) +8/Klick");
+            if (!diamantAxtGekauft) setzeShopLock(diamantAxtButton, "diamantAxt", "💎 Diamant-Axt (7500 Holz) +20/Klick");
+        }
+
         function shopKannGekauftWerden() {
-            return holz >= holzfaellerKosten
-                || holz >= foersterKosten
-                || holz >= holzlagerKosten
-                || holz >= saegewerkKosten
-                || holz >= eichhoernchenKosten
-                || holz >= biberKosten
-                || holz >= baerKosten
-                || (!axtGekauft && holz >= 100)
-                || (!eisenAxtGekauft && holz >= 750)
-                || (!motorsaegeGekauft && holz >= 1500)
-                || (!goldAxtGekauft && holz >= 2500)
-                || (!diamantAxtGekauft && holz >= 7500)
+            return (istShopItemFreigeschaltet("holzfaeller") && holz >= holzfaellerKosten)
+                || (istShopItemFreigeschaltet("foerster") && holz >= foersterKosten)
+                || (istShopItemFreigeschaltet("holzlager") && holz >= holzlagerKosten)
+                || (istShopItemFreigeschaltet("saegewerk") && holz >= saegewerkKosten)
+                || (istShopItemFreigeschaltet("eichhoernchen") && holz >= eichhoernchenKosten)
+                || (istShopItemFreigeschaltet("biber") && holz >= biberKosten)
+                || (istShopItemFreigeschaltet("baer") && holz >= baerKosten)
+                || (istShopItemFreigeschaltet("axt") && !axtGekauft && holz >= 100)
+                || (istShopItemFreigeschaltet("eisenAxt") && !eisenAxtGekauft && holz >= 750)
+                || (istShopItemFreigeschaltet("motorsaege") && !motorsaegeGekauft && holz >= 1500)
+                || (istShopItemFreigeschaltet("goldAxt") && !goldAxtGekauft && holz >= 2500)
+                || (istShopItemFreigeschaltet("diamantAxt") && !diamantAxtGekauft && holz >= 7500)
                 || (verwarnungen > 0 && holz >= 2000)
                 || klicks >= LUCKY_BLOCK_KOSTEN_KLICKS;
         }
