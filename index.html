@@ -1462,6 +1462,18 @@
             achievementListeAktualisieren();
         });
 
+        dailyButton.addEventListener("click", function () {
+            hauptMenueSchliessen();
+            dailyAufgabenInitialisieren();
+            dailyAufgabenAktualisieren(true);
+            dailyFenster.style.display = "block";
+            overlay.style.display = "block";
+            document.body.classList.add("fensterOffen");
+        });
+
+        dailySchliessenButton.addEventListener("click", alleFensterSchliessen);
+        dailyBelohnungButton.addEventListener("click", dailyBelohnungAbholen);
+
         wetterButton.addEventListener("click", function () {
             hauptMenueSchliessen();
             wetterFenster.style.display = "block";
@@ -1886,6 +1898,10 @@
             shopHinweisAktualisieren();
             dailyAufgabenAktualisieren(false);
             themeAnwenden(false);
+            shopHinweisAktualisieren();
+            if (dailyFenster && dailyFenster.style.display === "block") {
+                dailyAufgabenAktualisieren(true);
+            }
             achievementPruefen();
         }
 
@@ -3120,6 +3136,11 @@
                     aufgabe.fortschritt = Math.min(aufgabe.ziel, (aufgabe.fortschritt || 0) + wert);
                 }
             });
+
+            speichern();
+            if (dailyFenster && dailyFenster.style.display === "block") {
+                dailyAufgabenAktualisieren(true);
+            }
         }
 
         function dailyAlleFertig() {
