@@ -873,6 +873,47 @@
         <h2>👑 Admin-Menü</h2>
         <button id="adminSchliessenButton">❌ Schließen</button>
         <div id="adminInfoBox"></div>
+
+        <div class="shopBereich">
+            <h3>👤 Spieler verwalten</h3>
+            <div class="hinweis">
+                Hier kannst du als Admin einen Cloud-Spielstand über die Firebase-UID laden und bearbeiten.
+                Du brauchst nicht das Passwort des Spielers.
+            </div>
+            <input id="adminSpielerUidInput" placeholder="Spieler-UID eingeben">
+            <button id="adminSpielerLadenButton">🔍 Spieler laden</button>
+            <div id="adminSpielerBox" class="kartenBox">Noch kein Spieler geladen.</div>
+
+            <div class="adminGrid">
+                <span>Holz</span><input id="adminTargetHolzInput" type="number" min="0" placeholder="z.B. 10000">
+                <button id="adminTargetHolzSetzenButton">Holz setzen</button><button id="adminTargetHolzPlusButton">+ Holz</button>
+
+                <span>Klicks</span><input id="adminTargetKlicksInput" type="number" min="0" placeholder="z.B. 200">
+                <button id="adminTargetKlicksSetzenButton">Klicks setzen</button><button id="adminTargetKlicksPlusButton">+ Klicks</button>
+
+                <span>Gesamt-Holz</span><input id="adminTargetGesamtHolzInput" type="number" min="0" placeholder="z.B. 50000">
+                <button id="adminTargetGesamtHolzSetzenButton">Gesamt setzen</button><span></span>
+
+                <span>Holz/Klick</span><input id="adminTargetHPKInput" type="number" min="1" placeholder="z.B. 25">
+                <button id="adminTargetHPKSetzenButton">HPK setzen</button><span></span>
+
+                <span>Holz/Sekunde</span><input id="adminTargetHPSInput" type="number" min="0" placeholder="z.B. 100">
+                <button id="adminTargetHPSSetzenButton">HPS setzen</button><span></span>
+
+                <span>Prestige</span><input id="adminTargetPrestigeInput" type="number" min="0" placeholder="z.B. 5">
+                <button id="adminTargetPrestigeSetzenButton">Prestige setzen</button><span></span>
+
+                <span>Verwarnungen</span><input id="adminTargetVerwarnungInput" type="number" min="0" max="2" placeholder="0-2">
+                <button id="adminTargetVerwarnungSetzenButton">Verwarnungen setzen</button><span></span>
+            </div>
+
+            <button id="adminTargetSpeichernButton">☁️ Änderungen beim Spieler speichern</button>
+            <button id="adminTargetResetButton">🧹 Spieler-Spielstand zurücksetzen</button>
+            <div class="hinweis">
+                Wichtig: Das ändert den Cloud-Spielstand. Wenn der Spieler gerade online ist, sieht er es spätestens nach erneutem Laden/Cloud-Laden.
+            </div>
+        </div>
+
         <div class="shopBereich">
             <h3>🧪 Test-Funktionen</h3>
             <button id="adminHolzButton">+10.000 Holz</button>
@@ -1068,6 +1109,9 @@
         let aktivesTheme = "standard";
         let adminV1BalancingAktiv = false;
         let adminShopLocksAktiv = false;
+        let adminZielUid = "";
+        let adminZielSpielstand = null;
+        let adminZielEmail = "";
 
         const klickAnzeige = document.getElementById("klickAnzeige");
         const holzAnzeige = document.getElementById("holzAnzeige");
@@ -1229,6 +1273,28 @@
         const updateFenster = document.getElementById("updateFenster");
         const updateText = document.getElementById("updateText");
         const updateJetztButton = document.getElementById("updateJetztButton");
+
+        const adminSpielerUidInput = document.getElementById("adminSpielerUidInput");
+        const adminSpielerLadenButton = document.getElementById("adminSpielerLadenButton");
+        const adminSpielerBox = document.getElementById("adminSpielerBox");
+        const adminTargetHolzInput = document.getElementById("adminTargetHolzInput");
+        const adminTargetKlicksInput = document.getElementById("adminTargetKlicksInput");
+        const adminTargetGesamtHolzInput = document.getElementById("adminTargetGesamtHolzInput");
+        const adminTargetHPKInput = document.getElementById("adminTargetHPKInput");
+        const adminTargetHPSInput = document.getElementById("adminTargetHPSInput");
+        const adminTargetPrestigeInput = document.getElementById("adminTargetPrestigeInput");
+        const adminTargetVerwarnungInput = document.getElementById("adminTargetVerwarnungInput");
+        const adminTargetHolzSetzenButton = document.getElementById("adminTargetHolzSetzenButton");
+        const adminTargetHolzPlusButton = document.getElementById("adminTargetHolzPlusButton");
+        const adminTargetKlicksSetzenButton = document.getElementById("adminTargetKlicksSetzenButton");
+        const adminTargetKlicksPlusButton = document.getElementById("adminTargetKlicksPlusButton");
+        const adminTargetGesamtHolzSetzenButton = document.getElementById("adminTargetGesamtHolzSetzenButton");
+        const adminTargetHPKSetzenButton = document.getElementById("adminTargetHPKSetzenButton");
+        const adminTargetHPSSetzenButton = document.getElementById("adminTargetHPSSetzenButton");
+        const adminTargetPrestigeSetzenButton = document.getElementById("adminTargetPrestigeSetzenButton");
+        const adminTargetVerwarnungSetzenButton = document.getElementById("adminTargetVerwarnungSetzenButton");
+        const adminTargetSpeichernButton = document.getElementById("adminTargetSpeichernButton");
+        const adminTargetResetButton = document.getElementById("adminTargetResetButton");
 
         laden();
         offlineFortschrittBerechnen();
@@ -1638,6 +1704,19 @@
         adminVerwarnungSetzenButton.addEventListener("click", function () { adminWertSetzen("verwarnungen", adminVerwarnungInput.value); });
 
         bugListeLadenButton.addEventListener("click", bugReportsLaden);
+
+        adminSpielerLadenButton.addEventListener("click", adminSpielerLaden);
+        adminTargetHolzSetzenButton.addEventListener("click", function () { adminZielWertSetzen("holz", adminTargetHolzInput.value); });
+        adminTargetHolzPlusButton.addEventListener("click", function () { adminZielWertAddieren("holz", adminTargetHolzInput.value); });
+        adminTargetKlicksSetzenButton.addEventListener("click", function () { adminZielWertSetzen("klicks", adminTargetKlicksInput.value); });
+        adminTargetKlicksPlusButton.addEventListener("click", function () { adminZielWertAddieren("klicks", adminTargetKlicksInput.value); });
+        adminTargetGesamtHolzSetzenButton.addEventListener("click", function () { adminZielWertSetzen("gesamtHolz", adminTargetGesamtHolzInput.value); });
+        adminTargetHPKSetzenButton.addEventListener("click", function () { adminZielWertSetzen("holzProKlick", adminTargetHPKInput.value); });
+        adminTargetHPSSetzenButton.addEventListener("click", function () { adminZielWertSetzen("holzProSekunde", adminTargetHPSInput.value); });
+        adminTargetPrestigeSetzenButton.addEventListener("click", function () { adminZielWertSetzen("prestigePunkte", adminTargetPrestigeInput.value); });
+        adminTargetVerwarnungSetzenButton.addEventListener("click", function () { adminZielWertSetzen("verwarnungen", adminTargetVerwarnungInput.value); });
+        adminTargetSpeichernButton.addEventListener("click", adminZielSpeichern);
+        adminTargetResetButton.addEventListener("click", adminZielZuruecksetzen);
 
         statistikButton.addEventListener("click", function () {
             if (statistikBox.style.display === "block") {
@@ -2753,6 +2832,212 @@
             aktualisieren();
             adminInfoAktualisieren();
             meldungAnzeigen("👑 Admin: Wert hinzugefügt.");
+        }
+
+
+
+        async function adminSpielerLaden() {
+            if (!istAdmin) {
+                meldungAnzeigen("👑 Kein Admin-Zugriff.");
+                return;
+            }
+
+            const uid = adminSpielerUidInput.value.trim();
+
+            if (!uid || uid.length < 10) {
+                meldungAnzeigen("👤 Bitte eine gültige Spieler-UID eingeben.");
+                return;
+            }
+
+            adminSpielerBox.innerHTML = "Lade Spieler...";
+            adminZielUid = uid;
+            adminZielSpielstand = null;
+            adminZielEmail = "";
+
+            try {
+                const saveDoc = await getDoc(doc(db, "cloudSaves", uid));
+
+                if (!saveDoc.exists()) {
+                    adminSpielerBox.innerHTML = "Kein Cloud-Spielstand für diese UID gefunden.";
+                    return;
+                }
+
+                const daten = saveDoc.data();
+                adminZielEmail = daten.email || "";
+                adminZielSpielstand = daten.spielstand || null;
+
+                if (!adminZielSpielstand) {
+                    adminSpielerBox.innerHTML = "Der Cloud-Spielstand ist leer.";
+                    return;
+                }
+
+                adminTargetInputsFuellen();
+                adminZielAnzeigeAktualisieren();
+                meldungAnzeigen("👤 Spieler geladen.");
+            } catch (error) {
+                adminSpielerBox.innerHTML = "Spieler konnte nicht geladen werden.";
+                console.error(error);
+            }
+        }
+
+        function adminTargetInputsFuellen() {
+            if (!adminZielSpielstand) return;
+
+            adminTargetHolzInput.value = adminZielSpielstand.holz || 0;
+            adminTargetKlicksInput.value = adminZielSpielstand.klicks || 0;
+            adminTargetGesamtHolzInput.value = adminZielSpielstand.gesamtHolz || 0;
+            adminTargetHPKInput.value = adminZielSpielstand.holzProKlick || 1;
+            adminTargetHPSInput.value = adminZielSpielstand.holzProSekunde || 0;
+            adminTargetPrestigeInput.value = adminZielSpielstand.prestigePunkte || 0;
+            adminTargetVerwarnungInput.value = adminZielSpielstand.verwarnungen || 0;
+        }
+
+        function adminZielAnzeigeAktualisieren() {
+            if (!adminZielSpielstand) {
+                adminSpielerBox.innerHTML = "Noch kein Spieler geladen.";
+                return;
+            }
+
+            adminSpielerBox.innerHTML =
+                "<b>Geladene UID:</b><br>" + sichererText(adminZielUid) + "<br><br>" +
+                "<b>Name:</b> " + sichererText(adminZielSpielstand.spielerName || "Spieler") + "<br>" +
+                "<b>E-Mail:</b> " + sichererText(adminZielEmail || "unbekannt") + "<br><br>" +
+                "Klicks: " + (adminZielSpielstand.klicks || 0) + "<br>" +
+                "Holz: " + (adminZielSpielstand.holz || 0) + "<br>" +
+                "Gesamt-Holz: " + (adminZielSpielstand.gesamtHolz || 0) + "<br>" +
+                "HPK: " + (adminZielSpielstand.holzProKlick || 1) + " | HPS: " + (adminZielSpielstand.holzProSekunde || 0) + "<br>" +
+                "Prestige: " + (adminZielSpielstand.prestigePunkte || 0) + "<br>" +
+                "Verwarnungen: " + (adminZielSpielstand.verwarnungen || 0);
+        }
+
+        function adminZielZahlAusInput(wert) {
+            const zahl = Math.floor(Number(wert));
+
+            if (!Number.isFinite(zahl) || zahl < 0) {
+                meldungAnzeigen("👑 Bitte eine gültige Zahl eingeben.");
+                return null;
+            }
+
+            return zahl;
+        }
+
+        function adminZielWertSetzen(name, wert) {
+            if (!istAdmin || !adminZielSpielstand) {
+                meldungAnzeigen("👤 Bitte zuerst einen Spieler laden.");
+                return;
+            }
+
+            const zahl = adminZielZahlAusInput(wert);
+            if (zahl === null) return;
+
+            if (name === "holz") adminZielSpielstand.holz = zahl;
+            if (name === "klicks") adminZielSpielstand.klicks = zahl;
+            if (name === "gesamtHolz") adminZielSpielstand.gesamtHolz = zahl;
+            if (name === "holzProKlick") adminZielSpielstand.holzProKlick = Math.max(1, zahl);
+            if (name === "holzProSekunde") adminZielSpielstand.holzProSekunde = zahl;
+            if (name === "prestigePunkte") adminZielSpielstand.prestigePunkte = zahl;
+            if (name === "verwarnungen") adminZielSpielstand.verwarnungen = Math.min(2, zahl);
+
+            adminTargetInputsFuellen();
+            adminZielAnzeigeAktualisieren();
+            meldungAnzeigen("👑 Wert vorbereitet. Danach speichern drücken.");
+        }
+
+        function adminZielWertAddieren(name, wert) {
+            if (!istAdmin || !adminZielSpielstand) {
+                meldungAnzeigen("👤 Bitte zuerst einen Spieler laden.");
+                return;
+            }
+
+            const zahl = adminZielZahlAusInput(wert);
+            if (zahl === null) return;
+
+            if (name === "holz") {
+                adminZielSpielstand.holz = (adminZielSpielstand.holz || 0) + zahl;
+                adminZielSpielstand.gesamtHolz = (adminZielSpielstand.gesamtHolz || 0) + zahl;
+            }
+
+            if (name === "klicks") {
+                adminZielSpielstand.klicks = (adminZielSpielstand.klicks || 0) + zahl;
+                adminZielSpielstand.gesamtKlicksAllzeit = (adminZielSpielstand.gesamtKlicksAllzeit || 0) + zahl;
+            }
+
+            adminTargetInputsFuellen();
+            adminZielAnzeigeAktualisieren();
+            meldungAnzeigen("👑 Wert vorbereitet. Danach speichern drücken.");
+        }
+
+        async function adminZielSpeichern() {
+            if (!istAdmin || !adminZielUid || !adminZielSpielstand) {
+                meldungAnzeigen("👤 Bitte zuerst einen Spieler laden.");
+                return;
+            }
+
+            try {
+                adminZielSpielstand.letzterSpeicherZeitpunkt = Date.now();
+
+                await setDoc(doc(db, "cloudSaves", adminZielUid), {
+                    uid: adminZielUid,
+                    email: adminZielEmail,
+                    name: adminZielSpielstand.spielerName || "Spieler",
+                    spielstand: adminZielSpielstand,
+                    adminBearbeitetVon: spielerId,
+                    adminBearbeitetAm: serverTimestamp()
+                }, { merge: true });
+
+                await setDoc(doc(db, "spieler", adminZielUid), {
+                    name: adminZielSpielstand.spielerName || "Spieler",
+                    klicks: adminZielSpielstand.gesamtKlicksAllzeit || adminZielSpielstand.klicks || 0,
+                    gesamtHolz: adminZielSpielstand.gesamtHolz || 0,
+                    prestige: adminZielSpielstand.prestigePunkte || 0,
+                    aktualisiertAm: serverTimestamp()
+                }, { merge: true });
+
+                adminZielAnzeigeAktualisieren();
+                meldungAnzeigen("☁️ Spieler-Spielstand gespeichert.");
+            } catch (error) {
+                meldungAnzeigen("☁️ Spieler konnte nicht gespeichert werden.");
+                console.error(error);
+            }
+        }
+
+        async function adminZielZuruecksetzen() {
+            if (!istAdmin || !adminZielUid || !adminZielSpielstand) {
+                meldungAnzeigen("👤 Bitte zuerst einen Spieler laden.");
+                return;
+            }
+
+            const nameAlt = adminZielSpielstand.spielerName || "Spieler";
+
+            adminZielSpielstand = {
+                klicks: 0,
+                holz: 0,
+                gesamtHolz: 0,
+                holzProKlick: 1,
+                holzProSekunde: 0,
+                verwarnungen: 0,
+                prestigePunkte: 0,
+                spielerName: nameAlt,
+                gesamtKlicksAllzeit: 0,
+                gekaufteUpgrades: 0,
+                fehlkaeufeGesamt: 0,
+                wetterEreignisse: 0,
+                prestigeDurchgefuehrt: 0,
+                achievements: {},
+                aktiveHaustiere: {},
+                aktiverSkin: "standard",
+                gekaufteSkins: { standard: true },
+                dailyAufgabenTag: "",
+                dailyAufgaben: [],
+                dailyBelohnungGeholt: false,
+                aktivesTheme: "standard",
+                letzterSpeicherZeitpunkt: Date.now()
+            };
+
+            adminTargetInputsFuellen();
+            adminZielAnzeigeAktualisieren();
+            await adminZielSpeichern();
+            meldungAnzeigen("🧹 Spieler-Spielstand zurückgesetzt.");
         }
 
 
