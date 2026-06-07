@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Baumclicker Beta 2.3</title>
+    <title>Baumclicker Beta 2.4</title>
 
     <style>
         body {
@@ -540,6 +540,51 @@
             font-weight: bold;
         }
 
+
+
+        #gruenderButton {
+            background: #fff3b0;
+            font-weight: bold;
+        }
+
+        #gruenderButton.gruenderNeu {
+            animation: gruenderBlink 0.9s infinite alternate;
+            box-shadow: 0 0 15px rgba(255, 230, 80, 0.95);
+        }
+
+        @keyframes gruenderBlink {
+            from { transform: scale(1); }
+            to { transform: scale(1.08); }
+        }
+
+        .fortschrittBalken {
+            background: #d9ead3;
+            border-radius: 999px;
+            overflow: hidden;
+            height: 18px;
+            margin: 6px 0 12px;
+        }
+
+        .fortschrittFuellung {
+            background: #3cb043;
+            height: 100%;
+            width: 0%;
+        }
+
+        body.theme-gruender {
+            background-color: #071407;
+            background-image:
+                linear-gradient(90deg, rgba(0,255,90,0.15) 1px, transparent 1px),
+                linear-gradient(rgba(0,255,90,0.10) 1px, transparent 1px);
+            background-size: 28px 28px;
+        }
+
+        body.theme-gruender .fenster,
+        body.theme-gruender .shopBereich {
+            background: #ecffef;
+            border-color: #35d66b;
+        }
+
         @media (max-width: 600px) {
             body {
                 padding-top: 165px;
@@ -587,6 +632,7 @@
             <div id="prestigeAnzeige" class="statusChip">⭐ Prestige: 0 | Bonus: 0%</div>
             <div id="wetterAnzeige" class="statusChip">🌦️ Wetter in: 05:00</div>
             <div id="onlineAnzeige" class="statusChip">☁️ Online: wird verbunden...</div>
+            <div id="v1CountdownAnzeige" class="statusChip">⏳ V1: lädt...</div>
         </div>
 
         <div id="menueZeile">
@@ -609,6 +655,7 @@
                 </div>
             </div>
 
+            <button id="gruenderButton" class="gruenderNeu">❗ Gründer</button>
             <button id="adminButton">👑 Admin</button>
         </div>
     </div>
@@ -633,7 +680,7 @@
 
     <div id="meldung"></div>
     <div id="overlay"></div>
-    <div id="betaAnzeige">Beta 2.3</div>
+    <div id="betaAnzeige">Beta 2.4</div>
 
     <div id="shop" class="fenster">
         <h2>🏪 Shop</h2>
@@ -726,7 +773,7 @@
     <div id="dailyFenster" class="fenster">
         <h2>🎯 Tagesaufgaben</h2>
         <button id="dailySchliessenButton">❌ Schließen</button>
-        <div class="hinweis">Neue Aufgaben gibt es täglich. Beta 2.3 Testsystem.</div>
+        <div class="hinweis">Neue Aufgaben gibt es täglich. Beta 2.4 Testsystem.</div>
         <div id="dailyBox" class="kartenBox">Noch nicht geladen.</div>
         <button id="dailyBelohnungButton">🎁 Tagesbelohnung abholen</button>
     </div>
@@ -735,6 +782,15 @@
         <h2>📝 Änderungen & Behebungen</h2>
         <button id="aenderungenSchliessenButton">❌ Schließen</button>
         <div id="aenderungenBox">
+            <h3>Beta 2.4</h3>
+            <ul>
+                <li>🎉 Gründerprogramm mit eigenem ❗ Button eingebaut.</li>
+                <li>⏳ V1-Countdown oben in der Statusleiste ergänzt.</li>
+                <li>🎁 Gründer-Fortschritt für Liga/Prestige vorbereitet.</li>
+                <li>👑 Admin-Testbelohnungen für limitierte V1-Gründeritems eingebaut.</li>
+                <li>🐾 Limitiertes Test-Haustier und 🎨 limitierter Test-Skin vorbereitet.</li>
+            </ul>
+
             <h3>Beta 2.3</h3>
             <ul>
                 <li>🎯 Tagesaufgaben eingebaut.</li>
@@ -789,6 +845,29 @@
 
 
 
+
+
+    <div id="gruenderFenster" class="fenster">
+        <h2>🎉 V1 Gründerprogramm</h2>
+        <button id="gruenderSchliessenButton">❌ Schließen</button>
+        <div class="kartenBox">
+            <b>⏳ Beta-Ende / V1-Release</b><br>
+            <span id="gruenderCountdownText">Countdown wird geladen...</span>
+            <div class="hinweis">Bis dahin kannst du exklusive Gründer-Belohnungen freischalten.</div>
+        </div>
+        <div id="gruenderFortschrittBox" class="kartenBox">Fortschritt wird geladen...</div>
+        <div class="kartenBox">
+            <b>🎁 Mögliche Belohnungen</b><br>
+            🏅 Exklusives Abzeichen<br>
+            🐾 Limitiertes Haustier<br>
+            🎨 Limitierter Hintergrund<br>
+            🌳 Limitierter Skin<br>
+            👑 Besonderer Titel<br><br>
+            <b>Wichtig:</b> Die genauen Belohnungen bleiben bis V1 eine Überraschung.
+        </div>
+    </div>
+
+
     <div id="loginFenster" class="fenster">
         <h2>☁️ Baumclicker Login</h2>
         <div class="loginBox">
@@ -796,7 +875,7 @@
             <input id="loginPasswortInput" type="password" placeholder="Passwort">
             <button id="loginButton">🔐 Anmelden</button>
             <button id="registerButton">📝 Registrieren</button>
-            <div class="hinweis">Für Beta 2.3 brauchst du ein Konto. Dein Spielstand wird sicher in der Cloud gespeichert.</div>
+            <div class="hinweis">Für Beta 2.4 brauchst du ein Konto. Dein Spielstand wird sicher in der Cloud gespeichert.</div>
         </div>
     </div>
 
@@ -930,6 +1009,8 @@
             <h3>🧪 V1-Testlabor</h3>
             <button id="adminV1BalancingButton">Prestige-Balancing testen: AUS</button>
             <button id="adminShopLocksButton">Shop-Freischaltungen testen: AUS</button>
+            <button id="adminFounderRewardsButton">🎁 Gründer-Testbelohnungen aktivieren</button>
+            <button id="adminFounderRewardsRemoveButton">🧹 Gründer-Testbelohnungen entfernen</button>
             <div class="hinweis">Diese Tests sind nur für Admin sichtbar und gelten aktuell nur für deinen Spielstand.</div>
         </div>
 
@@ -1024,7 +1105,8 @@
         const WETTER_CHECK_SEKUNDEN = 300;
         const WETTER_CHANCE = 0.30;
         const LUCKY_BLOCK_KOSTEN_KLICKS = 200;
-        const SPIEL_VERSION = "2.3";
+        const SPIEL_VERSION = "2.4";
+        const V1_RELEASE_ZEIT = new Date("2026-06-13T18:00:00+02:00").getTime();
         const OFFLINE_MAX_SEKUNDEN = 60 * 60 * 8;
         const ADMIN_IDS = [
             "I4tKxmYCr9NQC3WtUwJ5dU4SXn02"
@@ -1115,6 +1197,15 @@
         let adminZielUid = "";
         let adminZielSpielstand = null;
         let adminZielEmail = "";
+        let gruenderInfoGelesen = false;
+        let gruenderBelohnungen = {
+            abzeichen: false,
+            haustier: false,
+            hintergrund: false,
+            skin: false,
+            titel: false,
+            muenzen: 0
+        };
 
         const klickAnzeige = document.getElementById("klickAnzeige");
         const holzAnzeige = document.getElementById("holzAnzeige");
@@ -1126,6 +1217,7 @@
         const wetterAnzeige = document.getElementById("wetterAnzeige");
         const verwarnungAnzeige = document.getElementById("verwarnungAnzeige");
         const onlineAnzeige = document.getElementById("onlineAnzeige");
+        const v1CountdownAnzeige = document.getElementById("v1CountdownAnzeige");
         const baumAnzeige = document.getElementById("baum");
         const wetterIcon = document.getElementById("wetterIcon");
         const meldung = document.getElementById("meldung");
@@ -1233,6 +1325,11 @@
         const bugSchliessenButton = document.getElementById("bugSchliessenButton");
         const bugTextInput = document.getElementById("bugTextInput");
         const bugSendenButton = document.getElementById("bugSendenButton");
+        const gruenderButton = document.getElementById("gruenderButton");
+        const gruenderFenster = document.getElementById("gruenderFenster");
+        const gruenderSchliessenButton = document.getElementById("gruenderSchliessenButton");
+        const gruenderCountdownText = document.getElementById("gruenderCountdownText");
+        const gruenderFortschrittBox = document.getElementById("gruenderFortschrittBox");
         const adminButton = document.getElementById("adminButton");
         const adminFenster = document.getElementById("adminFenster");
         const adminSchliessenButton = document.getElementById("adminSchliessenButton");
@@ -1247,6 +1344,8 @@
         const adminResetButton = document.getElementById("adminResetButton");
         const adminV1BalancingButton = document.getElementById("adminV1BalancingButton");
         const adminShopLocksButton = document.getElementById("adminShopLocksButton");
+        const adminFounderRewardsButton = document.getElementById("adminFounderRewardsButton");
+        const adminFounderRewardsRemoveButton = document.getElementById("adminFounderRewardsRemoveButton");
         const adminThemeStandardButton = document.getElementById("adminThemeStandardButton");
         const adminThemeWinterButton = document.getElementById("adminThemeWinterButton");
         const adminThemeGoldButton = document.getElementById("adminThemeGoldButton");
@@ -1311,6 +1410,8 @@
         firebaseStarten();
         loginFensterAnzeigen();
         setInterval(versionPruefen, 60000);
+        gruenderCountdownAktualisieren();
+        setInterval(gruenderCountdownAktualisieren, 1000);
 
         window.addEventListener("pagehide", function () {
             speichern();
@@ -1327,6 +1428,19 @@
         updateJetztButton.addEventListener("click", function () {
             location.reload();
         });
+
+        gruenderButton.addEventListener("click", function () {
+            hauptMenueSchliessen();
+            gruenderInfoGelesen = true;
+            gruenderButton.classList.remove("gruenderNeu");
+            gruenderFortschrittAktualisieren();
+            gruenderFenster.style.display = "block";
+            overlay.style.display = "block";
+            document.body.classList.add("fensterOffen");
+            speichern();
+        });
+
+        gruenderSchliessenButton.addEventListener("click", alleFensterSchliessen);
 
         loginButton.addEventListener("click", anmeldenMitEmail);
         registerButton.addEventListener("click", registrierenMitEmail);
@@ -1689,6 +1803,54 @@
             meldungAnzeigen("👑 Shop-Freischaltungen: " + (adminShopLocksAktiv ? "AN — Items werden nach Prestige gesperrt." : "AUS — alle Items normal verfügbar."));
         });
 
+        adminFounderRewardsButton.addEventListener("click", function () {
+            if (!istAdmin) return;
+            gruenderBelohnungen = {
+                abzeichen: true,
+                haustier: true,
+                hintergrund: true,
+                skin: true,
+                titel: true,
+                muenzen: 100
+            };
+            aktiveHaustiere.gruender_drache = true;
+            gekaufteSkins.gruender_weltenbaum = true;
+            aktiverSkin = "gruender_weltenbaum";
+            aktivesTheme = "gruender";
+            themeAnwenden(true);
+            speichern();
+            cloudSpeichern(true);
+            aktualisieren();
+            haustiereAktualisieren();
+            skinsAktualisieren();
+            adminInfoAktualisieren();
+            meldungAnzeigen("🎁 Gründer-Testbelohnungen aktiviert.");
+        });
+
+        adminFounderRewardsRemoveButton.addEventListener("click", function () {
+            if (!istAdmin) return;
+            gruenderBelohnungen = {
+                abzeichen: false,
+                haustier: false,
+                hintergrund: false,
+                skin: false,
+                titel: false,
+                muenzen: 0
+            };
+            delete aktiveHaustiere.gruender_drache;
+            delete gekaufteSkins.gruender_weltenbaum;
+            if (aktiverSkin === "gruender_weltenbaum") aktiverSkin = "standard";
+            if (aktivesTheme === "gruender") aktivesTheme = "standard";
+            themeAnwenden(true);
+            speichern();
+            cloudSpeichern(true);
+            aktualisieren();
+            haustiereAktualisieren();
+            skinsAktualisieren();
+            adminInfoAktualisieren();
+            meldungAnzeigen("🧹 Gründer-Testbelohnungen entfernt.");
+        });
+
         adminThemeStandardButton.addEventListener("click", function () { adminThemeSetzen("standard"); });
         adminThemeWinterButton.addEventListener("click", function () { adminThemeSetzen("winter"); });
         adminThemeGoldButton.addEventListener("click", function () { adminThemeSetzen("gold"); });
@@ -1820,6 +1982,7 @@
             ranglisteFenster.style.display = "none";
             achievementFenster.style.display = "none";
             dailyFenster.style.display = "none";
+            gruenderFenster.style.display = "none";
             aenderungenFenster.style.display = "none";
             einstellungenFenster.style.display = "none";
             haustierFenster.style.display = "none";
@@ -2303,6 +2466,8 @@
             aktivesTheme = "standard";
             adminV1BalancingAktiv = false;
             adminShopLocksAktiv = false;
+            gruenderInfoGelesen = false;
+            gruenderBelohnungen = { abzeichen: false, haustier: false, hintergrund: false, skin: false, titel: false, muenzen: 0 };
             themeAnwenden();
             onlineZuruecksetzen();
         }
@@ -2337,7 +2502,8 @@
                 achievements,
                 aktiveHaustiere, aktiverSkin, gekaufteSkins,
                 dailyAufgabenTag, dailyAufgaben, dailyBelohnungGeholt,
-                aktivesTheme, adminV1BalancingAktiv, adminShopLocksAktiv
+                aktivesTheme, adminV1BalancingAktiv, adminShopLocksAktiv,
+                gruenderInfoGelesen, gruenderBelohnungen
             };
 
             localStorage.setItem(SAVE_KEY, JSON.stringify(spielstand));
@@ -2412,6 +2578,9 @@
                 aktivesTheme = spielstand.aktivesTheme || "standard";
                 adminV1BalancingAktiv = spielstand.adminV1BalancingAktiv || false;
                 adminShopLocksAktiv = spielstand.adminShopLocksAktiv || false;
+                gruenderInfoGelesen = spielstand.gruenderInfoGelesen || false;
+                gruenderBelohnungen = spielstand.gruenderBelohnungen || { abzeichen: false, haustier: false, hintergrund: false, skin: false, titel: false, muenzen: 0 };
+                if (gruenderInfoGelesen && gruenderButton) gruenderButton.classList.remove("gruenderNeu");
             }
         }
 
@@ -2450,7 +2619,8 @@
                     winter: "🎄",
                     gold: "🌟",
                     sakura: "🌸",
-                    weltenbaum: "💎🌳"
+                    weltenbaum: "💎🌳",
+                    gruender_weltenbaum: "👑🌳"
                 };
                 baumAnzeige.textContent = skinEmoji[aktiverSkin] || baumAnzeige.textContent;
             }
@@ -2511,7 +2681,8 @@
                 "⭐ Prestige durchgeführt: " + prestigeDurchgefuehrt + "<br>" +
                 "🎁 Lucky Blocks gekauft: " + luckyBlocksGekauft + "<br>" +
                 "💎 Weltenbaum-Samen: " + (weltenbaumSamen ? "Ja" : "Nein") + "<br>" +
-                "🌈 Goldene Regenbogen: " + luckySpezialwetterAnzahl + "<br><br>" +
+                "🌈 Goldene Regenbogen: " + luckySpezialwetterAnzahl + "<br>" +
+                "🎉 Gründer-Testbelohnungen: " + (gruenderBelohnungen.abzeichen ? "Aktiv" : "Nicht aktiv") + "<br><br>" +
                 "<b>🎁 Lucky-Block-Statistik</b><br>" +
                 "🪵 Holzbonus: " + luckyHolzBonusAnzahl + "<br>" +
                 "🚀 Booster: " + luckyBoosterAnzahl + "<br>" +
@@ -2664,7 +2835,8 @@
                 "Prestige: " + prestigePunkte + "<br>" +
                 "Theme: " + sichererText(aktivesTheme) + "<br>" +
                 "V1-Balancing: " + (adminV1BalancingAktiv ? "AN" : "AUS") + "<br>" +
-                "Shop-Locks: " + (adminShopLocksAktiv ? "AN" : "AUS") + "<br><br>" +
+                "Shop-Locks: " + (adminShopLocksAktiv ? "AN" : "AUS") + "<br>" +
+                "Gründer-Test: " + (gruenderBelohnungen.abzeichen ? "AKTIV" : "AUS") + "<br><br>" +
                 "<b>Hinweis:</b> Admins werden nicht in der Rangliste gewertet.";
 
             adminV1BalancingButton.textContent = "Prestige-Balancing testen: " + (adminV1BalancingAktiv ? "AN" : "AUS");
@@ -3034,6 +3206,8 @@
                 dailyAufgaben: [],
                 dailyBelohnungGeholt: false,
                 aktivesTheme: "standard",
+                gruenderInfoGelesen: false,
+                gruenderBelohnungen: { abzeichen: false, haustier: false, hintergrund: false, skin: false, titel: false, muenzen: 0 },
                 letzterSpeicherZeitpunkt: Date.now()
             };
 
@@ -3249,6 +3423,7 @@
                 laden();
                 dailyAufgabenInitialisieren();
                 themeAnwenden();
+                if (gruenderInfoGelesen && gruenderButton) gruenderButton.classList.remove("gruenderNeu");
                 cloudGeladen = true;
                 cloudStartGeprueft = true;
                 sicherheitsSnapshotAktualisieren();
@@ -3304,6 +3479,10 @@
                     "</div>";
             });
 
+            if (gruenderBelohnungen.haustier) {
+                petHtml += "<div class='kartenBox'><b>🐉 Limitierter Gründerdrache</b><br>Exklusives V1-Test-Haustier. Aktuell nur kosmetisch, damit es später fair bleibt.<br><span class='aktivMarkierung'>Freigeschaltet</span></div>";
+            }
+
             haustierBox.innerHTML = petHtml;
         }
 
@@ -3343,11 +3522,13 @@
                 { id: "winter", name: "🎄 Winterbaum", kosten: 3000 },
                 { id: "gold", name: "🌟 Goldbaum", kosten: 10000 },
                 { id: "sakura", name: "🌸 Sakura", kosten: 15000 },
-                { id: "weltenbaum", name: "💎 Weltenbaum", kosten: 25000 }
+                { id: "weltenbaum", name: "💎 Weltenbaum", kosten: 25000 },
+                { id: "gruender_weltenbaum", name: "👑 Limitierter Gründer-Weltenbaum", kosten: 0, limited: true }
             ];
 
             let skinHtml = "";
             skins.forEach(function (skin) {
+                if (skin.limited && !gekaufteSkins[skin.id]) return;
                 const gekauft = gekaufteSkins[skin.id] === true;
                 const aktiv = aktiverSkin === skin.id;
                 skinHtml += "<div class='kartenBox'><b>" + skin.name + "</b><br>" +
@@ -3361,7 +3542,7 @@
         }
 
         window.baumclickerSkinKaufen = function (id) {
-            const kosten = { standard: 0, winter: 3000, gold: 10000, sakura: 15000, weltenbaum: 25000 }[id] || 999999;
+            const kosten = { standard: 0, winter: 3000, gold: 10000, sakura: 15000, weltenbaum: 25000, gruender_weltenbaum: 0 }[id] || 999999;
 
             if (holz < kosten) {
                 fehlkauf();
@@ -3652,7 +3833,7 @@
         }
 
         function themeAnwenden(meldung) {
-            document.body.classList.remove("theme-winter", "theme-gold", "theme-kristall", "theme-goetter");
+            document.body.classList.remove("theme-winter", "theme-gold", "theme-kristall", "theme-goetter", "theme-gruender");
 
             if (aktivesTheme && aktivesTheme !== "standard") {
                 document.body.classList.add("theme-" + aktivesTheme);
@@ -3662,9 +3843,21 @@
             if (aktivesTheme === "gold") baumAnzeige.textContent = "🌟";
             if (aktivesTheme === "kristall") baumAnzeige.textContent = "💎🌳";
             if (aktivesTheme === "goetter") baumAnzeige.textContent = "👑🌳";
+            if (aktivesTheme === "gruender") baumAnzeige.textContent = "👑🌳";
         }
 
         function themePartikelAktualisieren() {
+            if (aktivesTheme === "gruender" && Math.random() < 0.18) {
+                const code = document.createElement("div");
+                code.className = "schneeFlocke";
+                code.textContent = Math.random() < 0.5 ? "01" : "🌳";
+                code.style.left = Math.floor(Math.random() * 100) + "vw";
+                code.style.fontSize = (12 + Math.floor(Math.random() * 14)) + "px";
+                code.style.color = "#77ff99";
+                document.body.appendChild(code);
+                setTimeout(function () { code.remove(); }, 4200);
+            }
+
             if (aktivesTheme === "winter" && Math.random() < 0.25) {
                 const flocke = document.createElement("div");
                 flocke.className = "schneeFlocke";
@@ -3675,6 +3868,63 @@
                 setTimeout(function () { flocke.remove(); }, 4200);
             }
         }
+
+
+
+        function berechneSpielerLiga() {
+            return Math.max(1, prestigePunkte + 1);
+        }
+
+        function prozent(wert, ziel) {
+            return Math.max(0, Math.min(100, Math.floor((wert / ziel) * 100)));
+        }
+
+        function balken(wert, ziel) {
+            return "<div class='fortschrittBalken'><div class='fortschrittFuellung' style='width:" + prozent(wert, ziel) + "%'></div></div>";
+        }
+
+        function gruenderFortschrittAktualisieren() {
+            const liga = berechneSpielerLiga();
+            const prestige = prestigePunkte;
+
+            let html = "<b>Dein Gründer-Fortschritt</b><br><br>";
+            html += (liga >= 5 ? "✅" : "⬜") + " Liga 5 erreichen — " + liga + "/5" + balken(liga, 5);
+            html += (liga >= 10 ? "✅" : "⬜") + " Liga 10 erreichen — " + liga + "/10" + balken(liga, 10);
+            html += (prestige >= 5 ? "✅" : "⬜") + " Prestige 5 erreichen — " + prestige + "/5" + balken(prestige, 5);
+            html += (prestige >= 10 ? "✅" : "⬜") + " Prestige 10 erreichen — " + prestige + "/10" + balken(prestige, 10);
+            html += "<br><b>Hinweis:</b> Die Belohnungen werden erst zum V1-Release endgültig verteilt.";
+
+            if (gruenderBelohnungen.abzeichen) {
+                html += "<br><br><b>👑 Admin-Test aktiv:</b><br>Limitierte Gründerobjekte sind für diesen Account freigeschaltet.";
+            }
+
+            gruenderFortschrittBox.innerHTML = html;
+        }
+
+        function gruenderCountdownAktualisieren() {
+            const jetzt = Date.now();
+            let rest = Math.max(0, Math.floor((V1_RELEASE_ZEIT - jetzt) / 1000));
+            const tage = Math.floor(rest / 86400);
+            rest %= 86400;
+            const stunden = Math.floor(rest / 3600);
+            rest %= 3600;
+            const minuten = Math.floor(rest / 60);
+            const sekunden = rest % 60;
+
+            const kurz = tage > 0
+                ? "⏳ V1 in " + tage + "T " + stunden + "h"
+                : "⏳ V1 in " + stunden + "h " + minuten + "m";
+
+            const lang = tage + " Tage, " + stunden + " Stunden, " + minuten + " Minuten, " + sekunden + " Sekunden";
+
+            if (v1CountdownAnzeige) v1CountdownAnzeige.textContent = kurz;
+            if (gruenderCountdownText) gruenderCountdownText.textContent = "V1 geplant: Samstag, 13.06.2026 um 18:00 Uhr — noch " + lang;
+
+            if (gruenderFenster && gruenderFenster.style.display === "block") {
+                gruenderFortschrittAktualisieren();
+            }
+        }
+
 
         async function versionPruefen() {
             if (!firebaseBereit) return;
