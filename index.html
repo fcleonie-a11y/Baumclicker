@@ -1097,6 +1097,9 @@
         let istAdmin = false;
         let letzterBugReport = 0;
         let letzterCloudUpload = 0;
+        let letzterSicherheitsSnapshot = null;
+        let letzterSicherheitsZeitpunkt = Date.now();
+        let sicherheitsSperreAktiv = false;
         let nutzerEmail = "";
         let cloudGeladen = false;
         let cloudStartGeprueft = false;
@@ -3118,6 +3121,76 @@
                 && holzProSekunde === 0;
         }
 
+
+        function sicherheitsSnapshotErstellen() {
+            return {
+                zeit: Date.now(),
+                klicks: Math.floor(Number(klicks) || 0),
+                gesamtKlicksAllzeit: Math.floor(Number(gesamtKlicksAllzeit) || 0),
+                holz: Math.floor(Number(holz) || 0),
+                gesamtHolz: Math.floor(Number(gesamtHolz) || 0),
+                holzProKlick: Math.floor(Number(holzProKlick) || 1),
+                holzProSekunde: Math.floor(Number(holzProSekunde) || 0),
+                prestigePunkte: Math.floor(Number(prestigePunkte) || 0),
+                verwarnungen: Math.floor(Number(verwarnungen) || 0)
+            };
+        }
+
+        function sicherheitsSnapshotAktualisieren() {
+            letzterSicherheitsSnapshot = sicherheitsSnapshotErstellen();
+            letzterSicherheitsZeitpunkt = Date.now();
+            sicherheitsSperreAktiv = false;
+        }
+
+        function istGueltigeSpielZahl(wert, min, max) {
+            const zahl = Number(wert);
+            return Number.isFinite(zahl) && zahl >= min && zahl <= max;
+        }
+
+        function manipulationsCheckBestanden(grund) {
+            if (istAdmin) return true;
+
+            if (sicherheitsSperreAktiv) return false;
+
+            const zahlenOk =
+                istGueltigeSpielZahl(klicks, 0, 1000000000000) &&
+                istGueltigeSpielZahl(gesamtKlicksAllzeit, 0, 1000000000000) &&
+                istGueltigeSpielZahl(holz, 0, 1000000000000000) &&
+                istGueltigeSpielZahl(gesamtHolz, 0, 1000000000000000) &&
+                istGueltigeSpielZahl(holzProKlick, 1, 10000000) &&
+                istGueltigeSpielZahl(holzProSekunde, 0, 100000000) &&
+                istGueltigeSpielZahl(prestigePunkte, 0, 100000) &&
+                istGueltigeSpielZahl(verwarnungen, 0, 2);
+
+            if (!zahlenOk) {
+                sicherheitsSperreAktiv = true;
+                meldungAnzeigen("🔒 Manipulationsschutz: Ungültige Werte erkannt. Cloud-Speichern blockiert.");
+                return false;
+            }
+
+            if (!letzterSicherheitsSnapshot) {
+                sicherheitsSnapshotAktualisieren();
+                return true;
+            }
+
+            const jetzt = Date.now();
+            const sekunden = Math.max(1, Math.floor((jetzt - letzterSicherheitsSnapshot.zeit) / 1000));
+            const klickPlus = gesamtKlicksAllzeit - letzterSicherheitsSnapshot.gesamtKlicksAllzeit;
+            const holzPlus = gesamtHolz - letzterSicherheitsSnapshot.gesamtHolz;
+
+            const maxKlicksPlus = sekunden * 25 + 100;
+            const maxHolzPlus = Math.max(10000, sekunden * Math.max(1, berechneSekundenVerdienst() + berechneKlickVerdienst() * 25) * 8 + 250000);
+
+            if (klickPlus > maxKlicksPlus || holzPlus > maxHolzPlus) {
+                sicherheitsSperreAktiv = true;
+                meldungAnzeigen("🔒 Manipulationsschutz: Zu großer Sprung erkannt. Bitte Spiel neu laden.");
+                console.warn("Manipulationsschutz blockiert", { grund, sekunden, klickPlus, maxKlicksPlus, holzPlus, maxHolzPlus });
+                return false;
+            }
+
+            return true;
+        }
+
         async function cloudSpeichern(sofort) {
             if (!firebaseBereit || !spielerId) return;
             if (!cloudStartGeprueft) return;
@@ -3128,6 +3201,7 @@
             letzterCloudUpload = jetzt;
 
             try {
+                if (!manipulationsCheckBestanden("cloudSpeichern")) return;
                 speichern();
                 const gespeicherterStand = JSON.parse(localStorage.getItem(SAVE_KEY) || "{}");
 
@@ -3139,6 +3213,7 @@
                     aktualisiertAm: serverTimestamp()
                 }, { merge: true });
 
+                sicherheitsSnapshotAktualisieren();
                 onlineAnzeige.textContent = istAdmin ? "☁️ Cloud gespeichert | 👑 Admin" : "☁️ Cloud gespeichert";
             } catch (error) {
                 onlineAnzeige.textContent = "☁️ Cloud-Speichern fehlgeschlagen";
@@ -3176,6 +3251,7 @@
                 themeAnwenden();
                 cloudGeladen = true;
                 cloudStartGeprueft = true;
+                sicherheitsSnapshotAktualisieren();
                 aktualisieren();
                 meldungAnzeigen("☁️ Cloud-Spielstand geladen.");
             } catch (error) {
@@ -3201,6 +3277,7 @@
                     localStorage.setItem(SAVE_KEY, JSON.stringify(daten.spielstand));
                     laden();
                     cloudGeladen = true;
+                    sicherheitsSnapshotAktualisieren();
                     aktualisieren();
                     einstellungenAktualisieren();
                     meldungAnzeigen("☁️ Cloud-Spielstand geladen.");
@@ -3678,6 +3755,7 @@
             letzterOnlineUpload = jetzt;
 
             try {
+                if (!manipulationsCheckBestanden("onlineSpeichern")) return;
                 await setDoc(doc(db, "spieler", spielerId), {
                     name: spielerName,
                     klicks: gesamtKlicksAllzeit,
@@ -3686,6 +3764,7 @@
                     aktualisiertAm: serverTimestamp()
                 });
 
+                sicherheitsSnapshotAktualisieren();
                 onlineAnzeige.textContent = "☁️ Online: gespeichert";
             } catch (error) {
                 onlineAnzeige.textContent = "☁️ Online: Speichern fehlgeschlagen";
